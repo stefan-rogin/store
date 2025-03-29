@@ -7,6 +7,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @AutoConfigureMockMvc
@@ -17,8 +19,17 @@ class ApiControllerTests {
     private MockMvc mockMvc;
 
 	@Test
-	void getFake() throws Exception {
-        mockMvc.perform(get("/")).andExpect(status().isOk());
+	void getRoot() throws Exception {
+        mockMvc.perform(get("/"))
+            .andExpect(status().is(302))
+            .andExpect(header().string("Location", "/products"));
 	}
+
+    @Test
+    void getProducts() throws Exception {
+        mockMvc.perform(get("/products"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.products").exists());
+    }
 
 }

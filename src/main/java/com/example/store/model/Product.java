@@ -1,4 +1,4 @@
-package com.example.store.web.model;
+package com.example.store.model;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -15,7 +15,7 @@ public class Product {
     private String name;
 
     public Product() {
-        
+
     }
 
     public Product(String name) {

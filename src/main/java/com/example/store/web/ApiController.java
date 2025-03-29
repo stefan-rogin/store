@@ -2,14 +2,13 @@ package com.example.store.web;
 
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.GetMapping;
-
-import com.example.store.web.response.ProductResponse;
+import org.springframework.web.servlet.view.RedirectView;
 
 @RestController
 public class ApiController {
 
     @GetMapping("/")
-    public ProductResponse getProduct() {
-        return new ProductResponse(0L, "Not set");
+    public RedirectView redirectToProducts() {
+        return new RedirectView("/products");
     }
 }
