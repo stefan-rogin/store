@@ -41,6 +41,13 @@ class ProductControllerTests {
 
     @Test
     @Transactional
+    void failGetByIdMissing() throws Exception {
+        mockMvc.perform(get("/products/4"))
+            .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @Transactional
     void createProduct() throws Exception {
         mockMvc.perform(get("/products"))
             .andExpect(jsonPath("$", Matchers.hasSize(3)));
@@ -51,6 +58,15 @@ class ProductControllerTests {
             .andExpect(status().isOk());
         mockMvc.perform(get("/products"))
             .andExpect(jsonPath("$", Matchers.hasSize(4)));    
+    }
+
+    @Test
+    @Transactional
+    void failCreateProductIncomplete() throws Exception {
+        mockMvc.perform(post("/products")
+                .header("Content-type", "application/json")
+            )
+            .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -67,6 +83,25 @@ class ProductControllerTests {
 
     @Test
     @Transactional
+    void failUpdateFullProductMissing() throws Exception {
+        mockMvc.perform(put("/products/4")
+                .header("Content-type", "application/json")
+                .content("{\"name\": \"Three_changed\"}")
+            )
+            .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @Transactional
+    void failUpdateFullProductIncomplete() throws Exception {
+        mockMvc.perform(put("/products/3")
+                .header("Content-type", "application/json")
+            )
+            .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @Transactional
     void deleteProductById() throws Exception {
         mockMvc.perform(get("/products"))
             .andExpect(jsonPath("$", Matchers.hasSize(3)));
@@ -75,4 +110,13 @@ class ProductControllerTests {
             .andExpect(jsonPath("$", Matchers.hasSize(2)));
     }
 
+    @Test
+    @Transactional
+    void deleteProductByIdIgnoresMissing() throws Exception {
+        mockMvc.perform(get("/products"))
+            .andExpect(jsonPath("$", Matchers.hasSize(3)));
+        mockMvc.perform(delete("/products/4")).andExpect(status().isOk());
+        mockMvc.perform(get("/products"))
+            .andExpect(jsonPath("$", Matchers.hasSize(3)));
+    }
 }

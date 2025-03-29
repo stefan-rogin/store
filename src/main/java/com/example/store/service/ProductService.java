@@ -16,8 +16,7 @@ public class ProductService {
 
     public Product getById(Long id) {
         return productRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException(
-                        String.format("Unable to find product having Id:%d", id)));
+                .orElseThrow(() -> new IllegalArgumentException("id"));
     }
 
     public List<Product> list() {
@@ -34,8 +33,7 @@ public class ProductService {
                     target.setName(product.getName());
                     return productRepository.save(target);
                 })
-                .orElseThrow(() -> new IllegalArgumentException(
-                        String.format("Unable to find product having Id:%d", id)));
+                .orElseThrow(() -> new IllegalArgumentException("id"));
     }
 
     public void deleteById(Long id) {
