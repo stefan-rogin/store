@@ -22,6 +22,11 @@ public class Product {
         this.name = name;
     }
 
+    public Product(Long id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
     public String getName() {
         return this.name;
     }
@@ -32,6 +37,10 @@ public class Product {
 
     public Long getId() {
         return this.id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     @Override

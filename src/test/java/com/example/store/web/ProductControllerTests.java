@@ -8,10 +8,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import jakarta.transaction.Transactional;
 import org.hamcrest.Matchers;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -74,11 +71,12 @@ class ProductControllerTests {
     void updateFullProduct() throws Exception {
         mockMvc.perform(put("/products/3")
                 .header("Content-type", "application/json")
-                .content("{\"name\": \"Three_changed\"}")
+                .content("{\"name\": \"ThreeChanged\"}")
             )
-            .andExpect(status().isOk());
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.name").value("ThreeChanged"));
         mockMvc.perform(get("/products/3"))
-            .andExpect(jsonPath("$.name").value("Three_changed"));
+            .andExpect(jsonPath("$.name").value("ThreeChanged"));
     }
 
     @Test
@@ -86,7 +84,7 @@ class ProductControllerTests {
     void failUpdateFullProductMissing() throws Exception {
         mockMvc.perform(put("/products/4")
                 .header("Content-type", "application/json")
-                .content("{\"name\": \"Three_changed\"}")
+                .content("{\"name\": \"ThreeChanged\"}")
             )
             .andExpect(status().isNotFound());
     }
