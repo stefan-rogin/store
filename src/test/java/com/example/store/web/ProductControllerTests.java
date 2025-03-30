@@ -110,7 +110,7 @@ class ProductControllerTests {
     void deleteProductById() throws Exception {
         mockMvc.perform(get("/products"))
             .andExpect(jsonPath("$", Matchers.hasSize(3)));
-        mockMvc.perform(delete("/products/2")).andExpect(status().isOk());
+        mockMvc.perform(delete("/products/2")).andExpect(status().isNoContent());
         mockMvc.perform(get("/products"))
             .andExpect(jsonPath("$", Matchers.hasSize(2)));
     }
@@ -120,7 +120,7 @@ class ProductControllerTests {
     void deleteProductByIdIgnoresMissing() throws Exception {
         mockMvc.perform(get("/products"))
             .andExpect(jsonPath("$", Matchers.hasSize(3)));
-        mockMvc.perform(delete("/products/4")).andExpect(status().isOk());
+        mockMvc.perform(delete("/products/4")).andExpect(status().isNoContent());
         mockMvc.perform(get("/products"))
             .andExpect(jsonPath("$", Matchers.hasSize(3)));
     }
