@@ -1,9 +1,11 @@
 package com.example.store.model;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToOne;
 
 @Entity
 public class Product {
@@ -14,21 +16,26 @@ public class Product {
 
     private String name;
 
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    private Price price;
+
     public Product() {
 
     }
 
-    public Product(String name) {
+    public Product(String name, Price price) {
         this.name = name;
+        this.price = price;
     }
 
-    public Product(Long id, String name) {
+    public Product(Long id, String name, Price price) {
         this.id = id;
         this.name = name;
+        this.price = price;
     }
 
     public String getName() {
-        return this.name;
+        return name;
     }
 
     public void setName(String name) {
@@ -36,16 +43,38 @@ public class Product {
     }
 
     public Long getId() {
-        return this.id;
+        return id;
     }
 
     public void setId(Long id) {
         this.id = id;
     }
 
+    public Price getPrice() {
+        return price;
+    }
+
+    public void setPrice(Price price) {
+        this.price = price;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Product product = (Product) o;
+        return (id != null && id.equals(product.id)) || 
+           (id == null && name.equals(product.name) && price.equals(product.price));
+    }
+
+    @Override
+        public int hashCode() {
+        return java.util.Objects.hash(id, name, price);
+    }
+
     @Override
     public String toString() {
-        return String.format("[%d] %s", this.id, this.name);
+        return String.format("[%d] %s", id, name);
     }
 
 }
