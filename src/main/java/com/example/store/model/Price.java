@@ -1,6 +1,7 @@
 package com.example.store.model;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Currency;
 
 import jakarta.persistence.Entity;
@@ -42,14 +43,14 @@ public class Price {
         if (!currency.equals(augend.getCurrency())) {
             throw new IllegalArgumentException("Cannot operate different currencies.");
         }
-        return new Price(amount.add(augend.getAmount()), currency);
+        return new Price(amount.add(augend.getAmount()).setScale(2, RoundingMode.HALF_UP), currency);
     }
 
-    public Price substract(Price augend) {
+    public Price subtract(Price augend) {
         if (!currency.equals(augend.getCurrency())) {
             throw new IllegalArgumentException("Cannot operate different currencies.");
         }
-        return new Price(amount.subtract(augend.getAmount()), currency);
+        return new Price(amount.subtract(augend.getAmount()).setScale(2, RoundingMode.HALF_UP), currency);
     }
 
     @Override
@@ -67,7 +68,7 @@ public class Price {
 
     @Override
     public String toString() {
-        return String.format("%s %d", amount, currency);
+        return String.format("%s %s", currency, amount);
     }
 
 }
