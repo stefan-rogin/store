@@ -60,21 +60,23 @@ public class Product {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         Product product = (Product) o;
-        return (id != null && id.equals(product.id)) || 
-           (id == null && name.equals(product.name) && price.equals(product.price));
+        return (name.equals(product.name) && price.equals(product.price)) &&
+                ((id == null && product.id == null) || (id != null && id.equals(product.id)));
     }
 
     @Override
-        public int hashCode() {
+    public int hashCode() {
         return java.util.Objects.hash(id, name, price);
     }
 
     @Override
     public String toString() {
-        return String.format("[%d] %s", id, name);
+        return String.format("[%s] %s", id == null ? "null" : id, name);
     }
 
 }

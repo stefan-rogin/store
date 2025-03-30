@@ -68,16 +68,16 @@ class PriceTests {
         Price price1 = new Price(BigDecimal.valueOf(1.49), EUR_CURRENCY);
         Price price2 = new Price(BigDecimal.valueOf(1.49), EUR_CURRENCY);
         Price price3 = new Price(BigDecimal.valueOf(2.49), EUR_CURRENCY);
-        String price4 = "EUR 1.49";
-        Price price5 = price1;
+        Price price4 = new Price(BigDecimal.valueOf(1.49), Currency.getInstance("RON"));
 
         assertEquals(price1, price2);
-        assertEquals(price1, price5);
+        assertEquals(price1, price1);
         assertNotEquals(price1, price3);
         assertNotEquals(price1, price4);
+        assertNotEquals(price1, "EUR 1.49");
         assertNotEquals(price1, null);
-        assertEquals(price1.hashCode(), price2.hashCode());
-        assertNotEquals(price1.hashCode(), price3.hashCode());
+        assertEquals(price2.hashCode(), price1.hashCode());
+        assertNotEquals(price3.hashCode(), price1.hashCode());
     }
 
     @Test

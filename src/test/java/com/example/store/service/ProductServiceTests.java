@@ -1,4 +1,4 @@
-package com.example.store;
+package com.example.store.service;
 
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -24,7 +24,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import com.example.store.model.Price;
 import com.example.store.model.Product;
 import com.example.store.repository.ProductRepository;
-import com.example.store.service.ProductService;
 
 @SpringBootTest
 public class ProductServiceTests {
