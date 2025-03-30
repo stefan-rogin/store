@@ -55,9 +55,12 @@ class ProductControllerTests {
             .andExpect(jsonPath("$", Matchers.hasSize(3)));
         mockMvc.perform(post("/products")
                 .header("Content-type", "application/json")
-                .content("{\"name\": \"Four\"}")
-            )
-            .andExpect(status().isOk());
+                .content("{\"name\": \"Four\", \"price\": {\"amount\": 4.49, \"currency\": \"EUR\"} }"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.id").value(4))
+            .andExpect(jsonPath("$.name").value("Four"))
+            .andExpect(jsonPath("$.price.amount").value(4.49))
+            .andExpect(jsonPath("$.price.currency").value("EUR"));;
         mockMvc.perform(get("/products"))
             .andExpect(jsonPath("$", Matchers.hasSize(4)));    
     }
@@ -66,8 +69,7 @@ class ProductControllerTests {
     @Transactional
     void failCreateProductIncomplete() throws Exception {
         mockMvc.perform(post("/products")
-                .header("Content-type", "application/json")
-            )
+            .header("Content-type", "application/json"))
             .andExpect(status().isBadRequest());
     }
 
@@ -76,7 +78,7 @@ class ProductControllerTests {
     void updateFullProduct() throws Exception {
         mockMvc.perform(put("/products/3")
                 .header("Content-type", "application/json")
-                .content("{\"name\": \"ThreeChanged\"}")
+                .content("{\"name\": \"ThreeChanged\", \"price\": {\"amount\": 4.49, \"currency\": \"EUR\"} }")
             )
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.name").value("ThreeChanged"));
@@ -87,9 +89,9 @@ class ProductControllerTests {
     @Test
     @Transactional
     void failUpdateFullProductMissing() throws Exception {
-        mockMvc.perform(put("/products/4")
+        mockMvc.perform(put("/products/33")
                 .header("Content-type", "application/json")
-                .content("{\"name\": \"ThreeChanged\"}")
+                .content("{\"name\": \"Four\", \"price\": {\"amount\": 4.49, \"currency\": \"EUR\"} }")
             )
             .andExpect(status().isNotFound());
     }
