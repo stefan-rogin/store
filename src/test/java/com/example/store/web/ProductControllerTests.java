@@ -25,7 +25,10 @@ class ProductControllerTests {
         mockMvc.perform(get("/products"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$").isArray())
-            .andExpect(jsonPath("$", Matchers.hasSize(3)));
+            .andExpect(jsonPath("$", Matchers.hasSize(3)))
+            .andExpect(jsonPath("$[0].name").value("One"))
+            .andExpect(jsonPath("$[0].price.amount").value(1.49))
+            .andExpect(jsonPath("$[0].price.currency").value("EUR"));
     }
 
     @Test
@@ -33,7 +36,9 @@ class ProductControllerTests {
     void getById() throws Exception {
         mockMvc.perform(get("/products/2"))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.name").value("Two"));
+            .andExpect(jsonPath("$.name").value("Two"))
+            .andExpect(jsonPath("$.price.amount").value(2.49))
+            .andExpect(jsonPath("$.price.currency").value("EUR"));
     }
 
     @Test
