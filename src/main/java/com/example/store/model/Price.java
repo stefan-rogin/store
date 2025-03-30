@@ -4,12 +4,15 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Currency;
 
+import org.hibernate.annotations.SoftDelete;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
 @Entity
+@SoftDelete
 public class Price {
 
     @Id
