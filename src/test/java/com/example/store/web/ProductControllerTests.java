@@ -60,7 +60,7 @@ class ProductControllerTests {
             .andExpect(jsonPath("$.id").value(4))
             .andExpect(jsonPath("$.name").value("Four"))
             .andExpect(jsonPath("$.price.amount").value(4.49))
-            .andExpect(jsonPath("$.price.currency").value("EUR"));;
+            .andExpect(jsonPath("$.price.currency").value("EUR"));
         mockMvc.perform(get("/products"))
             .andExpect(jsonPath("$", Matchers.hasSize(4)));    
     }
@@ -70,6 +70,10 @@ class ProductControllerTests {
     void failCreateProductIncomplete() throws Exception {
         mockMvc.perform(post("/products")
             .header("Content-type", "application/json"))
+            .andExpect(status().isBadRequest());
+        mockMvc.perform(post("/products")
+            .header("Content-type", "application/json")
+            .content("{\"name\": \"\", \"price\": {\"amount\": 4.49} }"))
             .andExpect(status().isBadRequest());
     }
 
@@ -81,7 +85,9 @@ class ProductControllerTests {
                 .content("{\"name\": \"ThreeChanged\", \"price\": {\"amount\": 4.49, \"currency\": \"EUR\"} }")
             )
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.name").value("ThreeChanged"));
+            .andExpect(jsonPath("$.name").value("ThreeChanged"))
+            .andExpect(jsonPath("$.price.amount").value(4.49))
+            .andExpect(jsonPath("$.price.currency").value("EUR"));
         mockMvc.perform(get("/products/3"))
             .andExpect(jsonPath("$.name").value("ThreeChanged"));
     }
@@ -100,9 +106,16 @@ class ProductControllerTests {
     @Transactional
     void failUpdateFullProductIncomplete() throws Exception {
         mockMvc.perform(put("/products/3")
+                .header("Content-type", "application/json"))
+                .andExpect(status().isBadRequest());
+        mockMvc.perform(put("/products/3")
                 .header("Content-type", "application/json")
-            )
-            .andExpect(status().isBadRequest());
+                .content("{\"name\": \"Four\", \"price\": {\"amount\": 4.49} }"))
+                .andExpect(status().isBadRequest());
+        mockMvc.perform(put("/products/3")
+                .header("Content-type", "application/json")
+                .content("{\"name\": \"\", \"price\": {\"amount\": 4.49, \"currency\": \"EUR\"} }"))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -110,7 +123,7 @@ class ProductControllerTests {
     void deleteProductById() throws Exception {
         mockMvc.perform(get("/products"))
             .andExpect(jsonPath("$", Matchers.hasSize(3)));
-        mockMvc.perform(delete("/products/2")).andExpect(status().isNoContent());
+        mockMvc.perform(delete("/products/2")).andExpect(status().isOk());
         mockMvc.perform(get("/products"))
             .andExpect(jsonPath("$", Matchers.hasSize(2)));
     }
@@ -120,7 +133,7 @@ class ProductControllerTests {
     void deleteProductByIdIgnoresMissing() throws Exception {
         mockMvc.perform(get("/products"))
             .andExpect(jsonPath("$", Matchers.hasSize(3)));
-        mockMvc.perform(delete("/products/4")).andExpect(status().isNoContent());
+        mockMvc.perform(delete("/products/4")).andExpect(status().isOk());
         mockMvc.perform(get("/products"))
             .andExpect(jsonPath("$", Matchers.hasSize(3)));
     }

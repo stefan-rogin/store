@@ -4,6 +4,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.example.store.repository.ProductRepository;
@@ -19,11 +20,7 @@ public class ProductService {
 
     public Product getById(Long id) {
         return productRepository.findById(id)
-                .orElseThrow(() -> {
-                    // Likely client error
-                    logger.warn(String.format("Cannot findById(%d).", id));
-                    return new IllegalArgumentException("id");
-                });
+                .orElseThrow(() -> new ResourceNotFoundException("Product resource not found for id: " + id));
     }
 
     public List<Product> list() {
@@ -35,22 +32,22 @@ public class ProductService {
         return productRepository.save(product);
     }
 
-    public Product updateFull(Long id, Product product) {
+    public Product update(Long id, Product product) {
         logger.info(String.format("Audit Product.updateFull %d %s", id, product.toString()));
         return productRepository.findById(id)
-                .map(target -> {
-                    target.setName(product.getName());
-                    return productRepository.save(target);
-                })
-                .orElseThrow(() -> {
-                    // Likely client error
-                    logger.warn(String.format("Cannot findById(%d).", id));
-                    return new IllegalArgumentException("id");
-                });
+                .map(target -> productRepository.save(prepareUpdate(target, product))) // TODO: If prepare throws
+                .orElseThrow(() -> new ResourceNotFoundException("Product resource not found for id: " + id));
     }
 
     public void deleteById(Long id) {
         logger.info(String.format("Audit Product.delete %d", id));
         productRepository.deleteById(id);
+    }
+
+    public Product prepareUpdate(Product product, Product update) {
+        // TODO: Actual implementation for price change
+        product.setName(update.getName());
+        product.setPrice(update.getPrice());
+        return product;
     }
 }

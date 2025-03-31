@@ -8,8 +8,9 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToOne;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 @Entity
 @SoftDelete
@@ -19,11 +20,13 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // TODO: Tests
     @NotBlank
+    @Size(min = 1, max = 2000)
     @Column(columnDefinition = "TEXT")
     private String name;
 
-    @NotNull
+    @Valid
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     private Price price;
 
@@ -62,6 +65,7 @@ public class Product {
         return price;
     }
 
+    // TODO: Prevent currency change in model too?
     public void setPrice(Price price) {
         this.price = price;
     }

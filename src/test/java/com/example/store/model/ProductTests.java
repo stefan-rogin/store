@@ -9,7 +9,7 @@ import java.util.Currency;
 
 class ProductTests {
 
-        private Price createPriceEur(double amount) {
+    private Price createPriceEur(double amount) {
         return new Price(BigDecimal.valueOf(amount), Currency.getInstance("EUR"));
     }
 

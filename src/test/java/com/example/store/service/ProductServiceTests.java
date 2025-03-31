@@ -7,12 +7,14 @@ import org.mockito.MockitoAnnotations;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.random.RandomGenerator;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Currency;
@@ -20,6 +22,7 @@ import java.util.Currency;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 
 import com.example.store.model.Price;
 import com.example.store.model.Product;
@@ -62,7 +65,7 @@ public class ProductServiceTests {
     void failGetByIdMissing() {
         when(productRepository.findById(1L)).thenReturn(Optional.empty());
 
-        assertThrows(IllegalArgumentException.class, () -> productService.getById(1L));
+        assertThrows(ResourceNotFoundException.class, () -> productService.getById(1L));
     }
 
     @Test
@@ -103,7 +106,7 @@ public class ProductServiceTests {
     @Test
     void create() {
         Product product = new Product("One", createPriceEur(1.49));
-        when(productRepository.save(product)).thenReturn(product);
+        when(productRepository.save(any(Product.class))).thenReturn(product);
 
         Product result = productService.create(product);
 
@@ -115,13 +118,36 @@ public class ProductServiceTests {
     }
 
     @Test
-    void updateFull() {
-        Product target = new Product(1L, "One", createPriceEur(1.49));
-        Product updated = new Product(1L, "OneChanged", createPriceEur(1.39));
-        when(productRepository.findById(1L)).thenReturn(Optional.of(target));
-        when(productRepository.save(target)).thenReturn(updated);
+    void createFreeProduct() {
+        Product product = new Product("Zero", createPriceEur(0));
+        when(productRepository.save(any(Product.class))).thenReturn(product);
 
-        Product result = productService.updateFull(1L, updated);
+        Product result = productService.create(product);
+
+        assertNotNull(result);
+        assertEquals("Zero", result.getName());
+        assertEquals(BigDecimal.valueOf(0.00), result.getPrice().getAmount());
+        assertEquals("EUR", result.getPrice().getCurrency().getCurrencyCode());
+        verify(productRepository).save(product);
+    }
+
+    @Test
+    void failCreateNegativePriceProduct() {
+        when(productRepository.save(any(Product.class))).thenReturn(null);
+
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> productService.create(new Product("One", createPriceEur(-1.49))));
+    }
+
+    @Test
+    void update() {
+        Product target = new Product(1L, "One", createPriceEur(1.49));
+        Product update = new Product(1L, "OneChanged", createPriceEur(1.39));
+        when(productRepository.findById(1L)).thenReturn(Optional.of(target));
+        when(productRepository.save(any(Product.class))).thenReturn(productService.prepareUpdate(target, update));
+
+        Product result = productService.update(1L, update);
 
         assertNotNull(result);
         assertEquals("OneChanged", result.getName());
@@ -132,12 +158,12 @@ public class ProductServiceTests {
     }
 
     @Test
-    void failUpdateFullMissing() {
+    void failUpdateMissing() {
         when(productRepository.findById(1L)).thenReturn(Optional.empty());
 
         assertThrows(
-                IllegalArgumentException.class,
-                () -> productService.updateFull(1L, new Product("One", createPriceEur(1.49))));
+                ResourceNotFoundException.class,
+                () -> productService.update(1L, new Product("One", createPriceEur(1.49))));
     }
 
     @Test
