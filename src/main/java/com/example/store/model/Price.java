@@ -48,6 +48,7 @@ public class Price {
         return this.amount;
     }
 
+    // TODO: Keep?
     public void setAmount(BigDecimal amount) {
         if (amount.compareTo(BigDecimal.ZERO) < 0) {
             throw new IllegalArgumentException("Cannot create a negative price.");

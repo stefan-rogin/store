@@ -37,7 +37,7 @@ public class Product {
     }
 
     public Product(String name, Price price) {
-        this.name = name;
+        this.name = name.trim();
         this.price = price;
     }
 
@@ -52,7 +52,7 @@ public class Product {
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.name = name.trim();
     }
 
     public Long getId() {
