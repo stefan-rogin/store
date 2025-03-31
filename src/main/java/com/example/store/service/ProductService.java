@@ -1,6 +1,9 @@
 package com.example.store.service;
 
+import java.math.BigDecimal;
+import java.util.Currency;
 import java.util.List;
+import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,10 +36,45 @@ public class ProductService {
     }
 
     public Product update(Long id, Product product) {
-        logger.info(String.format("Audit Product.updateFull %d %s", id, product.toString()));
+        logger.info(String.format("Audit Product.update %d %s", id, product.toString()));
         return productRepository.findById(id)
                 .map(target -> productRepository.save(prepareUpdate(target, product))) // TODO: If prepare throws
                 .orElseThrow(() -> new ResourceNotFoundException("Product resource not found for id: " + id));
+    }
+
+    public Product patch(Long id, Map<String, Object> updates) {
+        // TODO: Deserialize updates for log
+        logger.info(String.format("Audit Product.patch %d", id));
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Product resource not found for id: " + id));
+
+        updates.forEach((key, value) -> {
+            switch (key) {
+                case "name":
+                    product.setName((String) value);
+                    break;
+                case "price":
+                    @SuppressWarnings("unchecked")
+                    Map<String, Object> priceMap = value instanceof Map ? (Map<String, Object>) value : null;
+                    if (priceMap == null
+                            || !priceMap.containsKey("amount")
+                            || !priceMap.containsKey("currency")) {
+                        throw new IllegalArgumentException("Invalid field: price");
+                    }
+                    BigDecimal amount = new BigDecimal(priceMap.get("amount").toString());
+                    Currency currency = Currency.getInstance(priceMap.get("currency").toString());
+                    if (amount == null || currency == null) {
+                        throw new IllegalArgumentException("Invalid field: price");
+                    }
+                    product.getPrice().setAmount(amount);
+                    product.getPrice().setCurrency(currency);
+                    break;
+                default:
+                    throw new IllegalArgumentException("Invalid field: " + key);
+            }
+        });
+
+        return productRepository.save(product);
     }
 
     public void deleteById(Long id) {

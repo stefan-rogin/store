@@ -48,7 +48,6 @@ public class Price {
         return this.amount;
     }
 
-    // TODO: Keep?
     public void setAmount(BigDecimal amount) {
         if (amount.compareTo(BigDecimal.ZERO) < 0) {
             throw new IllegalArgumentException("Cannot create a negative price.");
@@ -60,18 +59,8 @@ public class Price {
         return this.currency;
     }
 
-    public Price add(Price augend) {
-        if (!currency.equals(augend.getCurrency())) {
-            throw new IllegalArgumentException("Cannot operate different currencies.");
-        }
-        return new Price(amount.add(augend.getAmount()).setScale(DEFAULT_SCALE, DEFAULT_ROUNDING_MODE), currency);
-    }
-
-    public Price subtract(Price augend) {
-        if (!currency.equals(augend.getCurrency())) {
-            throw new IllegalArgumentException("Cannot operate different currencies.");
-        }
-        return new Price(amount.subtract(augend.getAmount()).setScale(DEFAULT_SCALE, DEFAULT_ROUNDING_MODE), currency);
+    public void setCurrency(Currency currency) {
+        this.currency = currency;
     }
 
     @Override
