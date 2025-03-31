@@ -16,6 +16,7 @@ import org.springframework.http.ProblemDetail;
 
 import com.example.store.service.ProductService;
 import com.example.store.model.Product;
+import com.example.store.model.Price;
 
 @RestController
 @Validated
@@ -45,7 +46,17 @@ public class ProductController {
     public Product update(@Positive @PathVariable Long id, @Valid @RequestBody Product product) {
         return productService.update(id, product);
     }
-    
+
+    @PatchMapping("/products/{id}/price")
+    public Product patchPrice(@Positive @PathVariable Long id, @Valid @RequestBody Price newPrice) {
+        return productService.patchPrice(id, newPrice);
+    }
+
+    @PatchMapping("/products/{id}/name")
+    public Product patch(@Positive @PathVariable Long id, @Valid @RequestBody Product productWithNewName) {
+        return productService.patchName(id, productWithNewName);
+    }
+        
     @DeleteMapping("/products/{id}")
     public void deleteById(@Positive @PathVariable Long id) {
         productService.deleteById(id);

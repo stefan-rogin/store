@@ -1,16 +1,21 @@
 package com.example.store.web;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
-import jakarta.transaction.Transactional;
-import org.hamcrest.Matchers;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import jakarta.transaction.Transactional;
 
 @AutoConfigureMockMvc
 @SpringBootTest
@@ -206,6 +211,74 @@ class ProductControllerTests {
                 .header("Content-type", "application/json")
                 .content("{\"name\": \"\", \"price\": {\"amount\": 4.49, \"currency\": \"EUR\"} }"))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @Transactional
+    void patchPrice() throws Exception {
+        mockMvc.perform(patch("/products/3/price")
+                .header("Content-type", "application/json")
+                .content("{\"amount\": 3.99, \"currency\": \"EUR\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.price.amount").value(3.99));
+        mockMvc.perform(patch("/products/2/price")
+                .header("Content-type", "application/json")
+                .content("{\"amount\": 2, \"currency\": \"RON\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("price.amount").value(2))
+                .andExpect(jsonPath("price.currency").value("RON"));
+    }
+
+    @Test
+    @Transactional
+    void failPatchPrice() throws Exception {
+        mockMvc.perform(patch("/products/3/price")
+                .header("Content-type", "application/json")
+                .content("{\"price\": {\"amount\": 0.2, \"currency\": \"RON\"}}"))
+                .andExpect(status().isBadRequest());
+        mockMvc.perform(patch("/products/3/price")
+                .header("Content-type", "application/json")
+                .content("{\"price\": {\"amount\": 0.2}}"))
+                .andExpect(status().isBadRequest());    
+        mockMvc.perform(patch("/products/3/price")
+                .header("Content-type", "application/json")
+                .content("{\"price\": {\"currency\": \"RON\"}}"))
+                .andExpect(status().isBadRequest());    
+    }
+
+    @Test
+    @Transactional
+    void patchName() throws Exception {
+        mockMvc.perform(patch("/products/3/name")
+                .header("Content-type", "application/json")
+                .content("{\"name\": \"ThreeChanged\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("ThreeChanged"));
+    }
+
+    @Test
+    @Transactional
+    void patchNameIgnoresPrice() throws Exception {
+        mockMvc.perform(patch("/products/3/name")
+                .header("Content-type", "application/json")
+                .content("{\"name\": \"ThreeChanged\", \"price\": {\"amount\": 4.99, \"currency\": \"RON\"} }"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("ThreeChanged"))
+                .andExpect(jsonPath("$.price.amount").value(3.49))
+                .andExpect(jsonPath("$.price.currency").value("EUR"));
+    }
+
+    @Test
+    @Transactional
+    void failPatchName() throws Exception {
+        mockMvc.perform(patch("/products/3/name")
+                .header("Content-type", "application/json")
+                .content("{\"name\": \" \"}"))
+                .andExpect(status().isBadRequest());
+        mockMvc.perform(patch("/products/3/name")
+                .header("Content-type", "application/json")
+                .content("NewName"))
+                .andExpect(status().isBadRequest());    
     }
 
     @Test

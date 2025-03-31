@@ -1,9 +1,6 @@
 package com.example.store.service;
 
-import java.math.BigDecimal;
-import java.util.Currency;
 import java.util.List;
-import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.store.repository.ProductRepository;
 import com.example.store.model.Product;
+import com.example.store.model.Price;
 
 @Service
 public class ProductService {
@@ -38,43 +36,22 @@ public class ProductService {
     public Product update(Long id, Product product) {
         logger.info(String.format("Audit Product.update %d %s", id, product.toString()));
         return productRepository.findById(id)
-                .map(target -> productRepository.save(prepareUpdate(target, product))) // TODO: If prepare throws
+                .map(target -> productRepository.save(prepareUpdate(target, product))) 
                 .orElseThrow(() -> new ResourceNotFoundException("Product resource not found for id: " + id));
     }
 
-    public Product patch(Long id, Map<String, Object> updates) {
-        // TODO: Deserialize updates for log
-        logger.info(String.format("Audit Product.patch %d", id));
-        Product product = productRepository.findById(id)
+    public Product patchPrice(Long id, Price newPrice) {
+        logger.info(String.format("Audit Product.patch.price %d %s", id, newPrice.toString()));
+        return productRepository.findById(id)
+                .map(target -> productRepository.save(preparePatchPrice(target, newPrice))) 
                 .orElseThrow(() -> new ResourceNotFoundException("Product resource not found for id: " + id));
+    }
 
-        updates.forEach((key, value) -> {
-            switch (key) {
-                case "name":
-                    product.setName((String) value);
-                    break;
-                case "price":
-                    @SuppressWarnings("unchecked")
-                    Map<String, Object> priceMap = value instanceof Map ? (Map<String, Object>) value : null;
-                    if (priceMap == null
-                            || !priceMap.containsKey("amount")
-                            || !priceMap.containsKey("currency")) {
-                        throw new IllegalArgumentException("Invalid field: price");
-                    }
-                    BigDecimal amount = new BigDecimal(priceMap.get("amount").toString());
-                    Currency currency = Currency.getInstance(priceMap.get("currency").toString());
-                    if (amount == null || currency == null) {
-                        throw new IllegalArgumentException("Invalid field: price");
-                    }
-                    product.getPrice().setAmount(amount);
-                    product.getPrice().setCurrency(currency);
-                    break;
-                default:
-                    throw new IllegalArgumentException("Invalid field: " + key);
-            }
-        });
-
-        return productRepository.save(product);
+    public Product patchName(Long id, Product productWithNewName) {
+        logger.info(String.format("Audit Product.patch.name %d %s", id, productWithNewName));
+        return productRepository.findById(id)
+                .map(target -> productRepository.save(preparePatchName(target, productWithNewName))) 
+                .orElseThrow(() -> new ResourceNotFoundException("Product resource not found for id: " + id));
     }
 
     public void deleteById(Long id) {
@@ -82,10 +59,20 @@ public class ProductService {
         productRepository.deleteById(id);
     }
 
-    public Product prepareUpdate(Product product, Product update) {
-        // TODO: Actual implementation for price change
-        product.setName(update.getName());
-        product.setPrice(update.getPrice());
+    // TODO: Extract
+    public Product prepareUpdate(Product target, Product update) {
+        target.setName(update.getName());
+        target.setPrice(update.getPrice());
+        return target;
+    }
+
+    public Product preparePatchPrice(Product target, Price newPrice) {
+        target.setPrice(newPrice);
+        return target;
+    }
+
+    public Product preparePatchName(Product product, Product productWithNewName) {
+        product.setName(productWithNewName.getName());
         return product;
     }
 }
