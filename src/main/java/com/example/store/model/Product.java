@@ -16,13 +16,15 @@ import jakarta.validation.constraints.Size;
 @SoftDelete
 public class Product {
 
+    public static final int MAX_NAME_SIZE = 2000;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     // TODO: Tests
     @NotBlank
-    @Size(min = 1, max = 2000)
+    @Size(min = 1, max = MAX_NAME_SIZE)
     @Column(columnDefinition = "TEXT")
     private String name;
 

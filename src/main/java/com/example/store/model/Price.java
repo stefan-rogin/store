@@ -18,13 +18,14 @@ import jakarta.validation.constraints.PositiveOrZero;
 public class Price {
 
     public static final int DEFAULT_SCALE = 2;
+    public static final int DEFAULT_PRECISION = 19;
     public static final RoundingMode DEFAULT_ROUNDING_MODE = RoundingMode.HALF_UP;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    @Column(precision = 19, scale = DEFAULT_SCALE)
+    @Column(precision = DEFAULT_PRECISION, scale = DEFAULT_SCALE)
     @PositiveOrZero
     private BigDecimal amount;
 

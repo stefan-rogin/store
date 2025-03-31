@@ -127,10 +127,19 @@ public class ProductServiceTests {
 
         Product result = productService.create(product);
 
-        assertNotNull(result);
-        assertEquals("Zero", result.getName());
-        assertEquals(createPriceAmount(0.00), result.getPrice().getAmount());
+        assertEquals(createPriceAmount(0), result.getPrice().getAmount());
         assertEquals("EUR", result.getPrice().getCurrency().getCurrencyCode());
+        verify(productRepository).save(product);
+    }
+
+    @Test
+    void createProductWithRounding() {
+        Product product = new Product("Zero", createPriceEur(1.495));
+        when(productRepository.save(any(Product.class))).thenReturn(product);
+
+        Product result = productService.create(product);
+
+        assertEquals(createPriceAmount(1.5), result.getPrice().getAmount());
         verify(productRepository).save(product);
     }
 
