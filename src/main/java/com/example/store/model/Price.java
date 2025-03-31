@@ -5,6 +5,7 @@ import java.math.RoundingMode;
 import java.util.Currency;
 
 import org.hibernate.annotations.SoftDelete;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -16,10 +17,14 @@ import jakarta.validation.constraints.PositiveOrZero;
 @SoftDelete
 public class Price {
 
+    public static final int DEFAULT_SCALE = 2;
+    public static final RoundingMode DEFAULT_ROUNDING_MODE = RoundingMode.HALF_UP;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
+    @Column(precision = 19, scale = DEFAULT_SCALE)
     @PositiveOrZero
     private BigDecimal amount;
 
@@ -34,12 +39,19 @@ public class Price {
         if (amount.compareTo(BigDecimal.ZERO) < 0) {
             throw new IllegalArgumentException("Cannot create a negative price.");
         }
-        this.amount = amount;
+        this.amount = amount.setScale(DEFAULT_SCALE, DEFAULT_ROUNDING_MODE);
         this.currency = currency;
     }
 
     public BigDecimal getAmount() {
         return this.amount;
+    }
+
+    public void setAmount(BigDecimal amount) {
+        if (amount.compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("Cannot create a negative price.");
+        }
+        this.amount = amount.setScale(DEFAULT_SCALE, DEFAULT_ROUNDING_MODE);
     }
 
     public Currency getCurrency() {
@@ -50,14 +62,14 @@ public class Price {
         if (!currency.equals(augend.getCurrency())) {
             throw new IllegalArgumentException("Cannot operate different currencies.");
         }
-        return new Price(amount.add(augend.getAmount()).setScale(2, RoundingMode.HALF_UP), currency);
+        return new Price(amount.add(augend.getAmount()).setScale(DEFAULT_SCALE, DEFAULT_ROUNDING_MODE), currency);
     }
 
     public Price subtract(Price augend) {
         if (!currency.equals(augend.getCurrency())) {
             throw new IllegalArgumentException("Cannot operate different currencies.");
         }
-        return new Price(amount.subtract(augend.getAmount()).setScale(2, RoundingMode.HALF_UP), currency);
+        return new Price(amount.subtract(augend.getAmount()).setScale(DEFAULT_SCALE, DEFAULT_ROUNDING_MODE), currency);
     }
 
     @Override

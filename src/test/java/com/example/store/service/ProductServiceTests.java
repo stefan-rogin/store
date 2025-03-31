@@ -14,7 +14,6 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.random.RandomGenerator;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Currency;
@@ -42,8 +41,12 @@ public class ProductServiceTests {
         MockitoAnnotations.openMocks(this);
     }
 
-    private Price createPriceEur(double amount) {
+    private static Price createPriceEur(double amount) {
         return new Price(BigDecimal.valueOf(amount), Currency.getInstance("EUR"));
+    }
+
+    private static BigDecimal createPriceAmount(double amount) {
+        return BigDecimal.valueOf(amount).setScale(Price.DEFAULT_SCALE, Price.DEFAULT_ROUNDING_MODE);
     }
 
     @Test
@@ -56,7 +59,7 @@ public class ProductServiceTests {
 
         assertNotNull(result);
         assertEquals("One", result.getName());
-        assertEquals(BigDecimal.valueOf(1.49), result.getPrice().getAmount());
+        assertEquals(createPriceAmount(1.49), result.getPrice().getAmount());
         assertEquals("EUR", result.getPrice().getCurrency().getCurrencyCode());
         verify(productRepository).findById(1L);
     }
@@ -83,9 +86,9 @@ public class ProductServiceTests {
         assertEquals("One", result.get(0).getName());
         assertEquals("Two", result.get(1).getName());
         assertEquals("Three", result.get(2).getName());
-        assertEquals(BigDecimal.valueOf(1.49), result.get(0).getPrice().getAmount());
-        assertEquals(BigDecimal.valueOf(2.49), result.get(1).getPrice().getAmount());
-        assertEquals(BigDecimal.valueOf(3.49), result.get(2).getPrice().getAmount());
+        assertEquals(createPriceAmount(1.49), result.get(0).getPrice().getAmount());
+        assertEquals(createPriceAmount(2.49), result.get(1).getPrice().getAmount());
+        assertEquals(createPriceAmount(3.49), result.get(2).getPrice().getAmount());
         assertEquals("EUR", result.get(0).getPrice().getCurrency().getCurrencyCode());
         assertEquals("EUR", result.get(1).getPrice().getCurrency().getCurrencyCode());
         assertEquals("EUR", result.get(2).getPrice().getCurrency().getCurrencyCode());
@@ -112,7 +115,7 @@ public class ProductServiceTests {
 
         assertNotNull(result);
         assertEquals("One", result.getName());
-        assertEquals(BigDecimal.valueOf(1.49), result.getPrice().getAmount());
+        assertEquals(createPriceAmount(1.49), result.getPrice().getAmount());
         assertEquals("EUR", result.getPrice().getCurrency().getCurrencyCode());
         verify(productRepository).save(product);
     }
@@ -126,7 +129,7 @@ public class ProductServiceTests {
 
         assertNotNull(result);
         assertEquals("Zero", result.getName());
-        assertEquals(BigDecimal.valueOf(0.00), result.getPrice().getAmount());
+        assertEquals(createPriceAmount(0.00), result.getPrice().getAmount());
         assertEquals("EUR", result.getPrice().getCurrency().getCurrencyCode());
         verify(productRepository).save(product);
     }
@@ -151,7 +154,7 @@ public class ProductServiceTests {
 
         assertNotNull(result);
         assertEquals("OneChanged", result.getName());
-        assertEquals(BigDecimal.valueOf(1.39), result.getPrice().getAmount());
+        assertEquals(createPriceAmount(1.39), result.getPrice().getAmount());
         assertEquals("EUR", result.getPrice().getCurrency().getCurrencyCode());
         verify(productRepository).findById(1L);
         verify(productRepository).save(target);
