@@ -58,6 +58,28 @@ class ProductControllerTests {
 
     @Test
     @Transactional
+    void searchWithResults() throws Exception {
+        mockMvc.perform(get("/products/search?search=oil"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$").isArray())
+            .andExpect(jsonPath("$", Matchers.hasSize(2)))
+            .andExpect(jsonPath("$[0].name").value("Cooking Oil"))
+            .andExpect(jsonPath("$[1].name").value("Engine Oil"))
+            .andExpect(jsonPath("$[0].price.amount").value(4.99))
+            .andExpect(jsonPath("$[0].price.currency").value("EUR"));
+    }
+
+    @Test
+    @Transactional
+    void searchWithoutResults() throws Exception {
+        mockMvc.perform(get("/products/search?search=Nothing"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$").isArray())
+            .andExpect(jsonPath("$", Matchers.hasSize(0)));
+    }
+
+    @Test
+    @Transactional
     void createProduct() throws Exception {
         mockMvc.perform(get("/products"))
             .andExpect(jsonPath("$", Matchers.hasSize(33)));

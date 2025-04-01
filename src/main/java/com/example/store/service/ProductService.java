@@ -27,6 +27,11 @@ public class ProductService {
         return (List<Product>) productRepository.findAll();
     }
 
+    public Optional<List<Product>> search(String searchTerm) {
+        List<Product> products = productRepository.search(searchTerm);
+        return products.isEmpty() ? Optional.empty() : Optional.of(products);
+    }
+
     public Product create(Product product) {
         logger.info(String.format("Audit Product.create %s", product.toString()));
         return productRepository.save(product);

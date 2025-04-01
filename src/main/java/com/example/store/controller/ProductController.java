@@ -33,6 +33,11 @@ public class ProductController {
             .orElseThrow(() -> new ErrorResponseException(HttpStatus.NOT_FOUND));
     }
     
+    @GetMapping("/products/search")
+    public List<Product> search(@RequestParam String search) {
+        return productService.search(search).orElse(List.of());
+    }
+
     @PostMapping("/products")
     public Product create(@Valid @RequestBody Product product) {
         return productService.create(product);

@@ -94,6 +94,19 @@ public class ProductServiceTests {
     }
 
     @Test
+    void search() {
+        List<Product> products = List.of(
+                new Product(1L, "One apple", createPriceEur(1.49)),
+                new Product(2L, "Two apples", createPriceEur(2.49)),
+                new Product(3L, "Three apples", createPriceEur(3.49)));
+        when(productRepository.search("Apple")).thenReturn(products);
+
+        List<Product> results = productRepository.search("Apple");
+
+        assertEquals(3, results.size());
+    }
+
+    @Test
     void create() {
         Product product = new Product(null, "One", createPriceEur(1.49));
         when(productRepository.save(any(Product.class))).thenReturn(product);

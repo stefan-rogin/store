@@ -57,7 +57,7 @@ insert into product(name, price_id, deleted) values('Chicken Meat', 22, false);
 insert into price(amount, currency, deleted) values(4.99, 'EUR', false);
 insert into product(name, price_id, deleted) values('Cooking Oil', 23, false);
 insert into price(amount, currency, deleted) values(1.49, 'EUR', false);
-insert into product(name, price_id, deleted) values('Cucumber', 24, false);
+insert into product(name, price_id, deleted) values('Engine Oil', 24, false);
 insert into price(amount, currency, deleted) values(10.99, 'EUR', false);
 insert into product(name, price_id, deleted) values('Dog Food', 25, false);
 insert into price(amount, currency, deleted) values(2.99, 'EUR', false);
