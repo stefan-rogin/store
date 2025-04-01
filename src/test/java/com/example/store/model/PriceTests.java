@@ -26,9 +26,24 @@ class PriceTests {
     }
 
     @Test
-    void failConstructorNegativeAmount() {
+    void failConstructorInvalid() {
         assertThrows(IllegalArgumentException.class, 
                 () -> new Price(createPriceAmount(-1), EUR_CURRENCY));
+        assertThrows(IllegalArgumentException.class, 
+                () -> new Price(createPriceAmount(1.49), null));
+    }
+
+    @Test
+    void failSettingNegativeAmount() {
+        Price target = new Price(createPriceAmount(1.49), EUR_CURRENCY);
+        assertThrows(IllegalArgumentException.class, 
+                () -> target.setAmount(createPriceAmount(-1.49)));
+    }
+
+    @Test
+    void failSettingNullCurrency() {
+        assertThrows(IllegalArgumentException.class, 
+                () -> new Price(createPriceAmount(1.49), null));
     }
 
     @Test
