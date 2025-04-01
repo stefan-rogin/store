@@ -3,7 +3,6 @@ package com.example.store.controller;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import org.hamcrest.Matchers;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,11 +31,11 @@ class ProductControllerTests {
     void listAllProducts() throws Exception {
         mockMvc.perform(get("/products"))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$").isArray())
-            .andExpect(jsonPath("$", Matchers.hasSize(33)))
-            .andExpect(jsonPath("$[0].name").value("One"))
-            .andExpect(jsonPath("$[0].price.amount").value(1.49))
-            .andExpect(jsonPath("$[0].price.currency").value("EUR"));
+            .andExpect(jsonPath("$.content").isArray())
+            .andExpect(jsonPath("$.totalElements").value(33))
+            .andExpect(jsonPath("$.content[0].name").value("Annibale Colombo Bed"))
+            .andExpect(jsonPath("$.content[0].price.amount").value(1899.99))
+            .andExpect(jsonPath("$.content[0].price.currency").value("EUR"));
     }
 
     @Test
@@ -59,14 +58,13 @@ class ProductControllerTests {
     @Test
     @Transactional
     void searchWithResults() throws Exception {
-        mockMvc.perform(get("/products/search?search=oil"))
+        mockMvc.perform(get("/products/search?searchTerm=oil"))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$").isArray())
-            .andExpect(jsonPath("$", Matchers.hasSize(2)))
-            .andExpect(jsonPath("$[0].name").value("Cooking Oil"))
-            .andExpect(jsonPath("$[1].name").value("Engine Oil"))
-            .andExpect(jsonPath("$[0].price.amount").value(4.99))
-            .andExpect(jsonPath("$[0].price.currency").value("EUR"));
+            .andExpect(jsonPath("$.numberOfElements").value(2))
+            .andExpect(jsonPath("$.content[0].name").value("Cooking Oil"))
+            .andExpect(jsonPath("$.content[1].name").value("Engine Oil"))
+            .andExpect(jsonPath("$.content[0].price.amount").value(4.99))
+            .andExpect(jsonPath("$.content[0].price.currency").value("EUR"));
     }
 
     @Test
@@ -74,15 +72,14 @@ class ProductControllerTests {
     void searchWithoutResults() throws Exception {
         mockMvc.perform(get("/products/search?search=Nothing"))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$").isArray())
-            .andExpect(jsonPath("$", Matchers.hasSize(0)));
+            .andExpect(jsonPath("$.totalElements").value(0));
     }
 
     @Test
     @Transactional
     void createProduct() throws Exception {
         mockMvc.perform(get("/products"))
-            .andExpect(jsonPath("$", Matchers.hasSize(33)));
+            .andExpect(jsonPath("$.totalElements").value(33));
         mockMvc.perform(post("/products")
                 .header("Content-type", "application/json")
                 .content("{\"name\": \"Four\", \"price\": {\"amount\": 4.49, \"currency\": \"EUR\"} }"))
@@ -91,8 +88,8 @@ class ProductControllerTests {
             .andExpect(jsonPath("$.name").value("Four"))
             .andExpect(jsonPath("$.price.amount").value(4.49))
             .andExpect(jsonPath("$.price.currency").value("EUR"));
-        mockMvc.perform(get("/products"))
-            .andExpect(jsonPath("$", Matchers.hasSize(34)));    
+            mockMvc.perform(get("/products"))
+            .andExpect(jsonPath("$.totalElements").value(34));  
     }
 
     @Test
@@ -302,19 +299,19 @@ class ProductControllerTests {
     @Transactional
     void deleteProductById() throws Exception {
         mockMvc.perform(get("/products"))
-            .andExpect(jsonPath("$", Matchers.hasSize(33)));
+            .andExpect(jsonPath("$.totalElements").value(33));
         mockMvc.perform(delete("/products/2")).andExpect(status().isOk());
         mockMvc.perform(get("/products"))
-            .andExpect(jsonPath("$", Matchers.hasSize(32)));
+            .andExpect(jsonPath("$.totalElements").value(32));
     }
 
     @Test
     @Transactional
     void deleteProductByIdIgnoresMissing() throws Exception {
         mockMvc.perform(get("/products"))
-            .andExpect(jsonPath("$", Matchers.hasSize(33)));
+            .andExpect(jsonPath("$.totalElements").value(33));
         mockMvc.perform(delete("/products/34")).andExpect(status().isOk());
         mockMvc.perform(get("/products"))
-            .andExpect(jsonPath("$", Matchers.hasSize(33)));
+            .andExpect(jsonPath("$.totalElements").value(33));
     }
 }

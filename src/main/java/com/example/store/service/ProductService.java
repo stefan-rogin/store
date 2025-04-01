@@ -1,11 +1,12 @@
 package com.example.store.service;
 
-import java.util.List;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import com.example.store.repository.ProductRepository;
 import com.example.store.model.Product;
@@ -23,13 +24,12 @@ public class ProductService {
         return productRepository.findById(id);
     }
 
-    public List<Product> list() {
-        return (List<Product>) productRepository.findAll();
+    public Page<Product> list(Pageable pageable) {
+        return productRepository.findAll(pageable);
     }
 
-    public Optional<List<Product>> search(String searchTerm) {
-        List<Product> products = productRepository.search(searchTerm);
-        return products.isEmpty() ? Optional.empty() : Optional.of(products);
+    public Page<Product> search(String searchTerm, Pageable pageable) {
+        return productRepository.search(searchTerm, pageable);
     }
 
     public Product create(Product product) {

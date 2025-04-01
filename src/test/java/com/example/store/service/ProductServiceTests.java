@@ -13,12 +13,14 @@ import static org.mockito.Mockito.when;
 import java.util.List;
 import java.util.Optional;
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Currency;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
 import com.example.store.model.Price;
 import com.example.store.model.Product;
@@ -62,48 +64,51 @@ public class ProductServiceTests {
 
     @Test
     void listAllProducts() {
-        List<Product> products = List.of(
+        Pageable pageable = Pageable.ofSize(3);
+        Page<Product> products = new PageImpl<Product>(List.of(
                 new Product(1L, "One", createPriceEur(1.49)),
                 new Product(2L, "Two", createPriceEur(2.49)),
-                new Product(3L, "Three", createPriceEur(3.49)));
-        when(productRepository.findAll()).thenReturn(products);
+                new Product(3L, "Three", createPriceEur(3.49))));
+        when(productRepository.findAll(any(Pageable.class))).thenReturn(products);
 
-        List<Product> result = productService.list();
+        Page<Product> result = productService.list(pageable);
 
-        assertEquals(3, result.size());
-        assertEquals("One", result.get(0).getName());
-        assertEquals("Two", result.get(1).getName());
-        assertEquals("Three", result.get(2).getName());
-        assertEquals(createPriceAmount(1.49), result.get(0).getPrice().getAmount());
-        assertEquals(createPriceAmount(2.49), result.get(1).getPrice().getAmount());
-        assertEquals(createPriceAmount(3.49), result.get(2).getPrice().getAmount());
-        assertEquals("EUR", result.get(0).getPrice().getCurrency().getCurrencyCode());
-        assertEquals("EUR", result.get(1).getPrice().getCurrency().getCurrencyCode());
-        assertEquals("EUR", result.get(2).getPrice().getCurrency().getCurrencyCode());
-        verify(productRepository).findAll();
+        assertEquals(3, result.getSize());
+        assertEquals("One", result.getContent().get(0).getName());
+        assertEquals("Two", result.getContent().get(1).getName());
+        assertEquals("Three", result.getContent().get(2).getName());
+        assertEquals(createPriceAmount(1.49), result.getContent().get(0).getPrice().getAmount());
+        assertEquals(createPriceAmount(2.49), result.getContent().get(1).getPrice().getAmount());
+        assertEquals(createPriceAmount(3.49), result.getContent().get(2).getPrice().getAmount());
+        assertEquals("EUR", result.getContent().get(0).getPrice().getCurrency().getCurrencyCode());
+        assertEquals("EUR", result.getContent().get(1).getPrice().getCurrency().getCurrencyCode());
+        assertEquals("EUR", result.getContent().get(2).getPrice().getCurrency().getCurrencyCode());
+        verify(productRepository).findAll(pageable);
     }
 
     @Test
     void listEmptySet() {
-        when(productRepository.findAll()).thenReturn(new ArrayList<Product>());
+        Pageable pageable = Pageable.ofSize(3);
+        when(productRepository.findAll(any(Pageable.class))).thenReturn(Page.empty());
 
-        List<Product> result = productService.list();
+        Page<Product> result = productService.list(pageable);
 
-        assertEquals(0, result.size());
-        verify(productRepository).findAll();
+        assertEquals(0, result.getSize());
+        verify(productRepository).findAll(pageable);
     }
 
     @Test
     void search() {
-        List<Product> products = List.of(
+        Pageable pageable = Pageable.ofSize(3);
+        Page<Product> products = new PageImpl<Product>(List.of(
                 new Product(1L, "One apple", createPriceEur(1.49)),
                 new Product(2L, "Two apples", createPriceEur(2.49)),
-                new Product(3L, "Three apples", createPriceEur(3.49)));
-        when(productRepository.search("Apple")).thenReturn(products);
+                new Product(3L, "Three apples", createPriceEur(3.49))));
+        when(productRepository.search("Apple", pageable)).thenReturn(products);
 
-        List<Product> results = productRepository.search("Apple");
+        Page<Product> results = productRepository.search("Apple", pageable);
 
-        assertEquals(3, results.size());
+        assertEquals(3, results.getSize());
     }
 
     @Test

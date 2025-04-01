@@ -8,7 +8,9 @@ import org.springframework.validation.annotation.Validated;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 
 import com.example.store.service.ProductService;
@@ -23,8 +25,8 @@ public class ProductController {
     private ProductService productService;
 
     @GetMapping("/products")
-    public List<Product> list() {
-        return productService.list();
+    public Page<Product> list(@PageableDefault(size = 10, sort = "name") Pageable pageable) {
+        return productService.list(pageable);
     }
 
     @GetMapping("/products/{id}")
@@ -34,8 +36,10 @@ public class ProductController {
     }
     
     @GetMapping("/products/search")
-    public List<Product> search(@RequestParam String search) {
-        return productService.search(search).orElse(List.of());
+    public Page<Product> search(
+            @RequestParam(required = false) String searchTerm,
+            @PageableDefault(size = 10, sort = "name") Pageable pageable) {
+        return productService.search(searchTerm, pageable);
     }
 
     @PostMapping("/products")
