@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.example.store.repository.ProductRepository;
 import com.example.store.model.Product;
@@ -33,30 +35,30 @@ public class ProductService {
     }
 
     public Product create(Product product) {
-        logger.info(String.format("Audit Product.create %s", product.toString()));
+        logger.info(String.format("Audit Product.create by user %s: %s", getCurrentUsername(), product.toString()));
         return productRepository.save(product);
     }
 
     public Optional<Product> update(Long id, Product product) {
-        logger.info(String.format("Audit Product.update %d %s", id, product.toString()));
+        logger.info(String.format("Audit Product.update by user %s at /%s: %s", getCurrentUsername(), id, product.toString()));
         return productRepository.findById(id)
                 .map(target -> productRepository.save(prepareUpdate(target, product)));
     }
 
     public Optional<Product> patchPrice(Long id, Price newPrice) {
-        logger.info(String.format("Audit Product.patch.price %d %s", id, newPrice.toString()));
+        logger.info(String.format("Audit Product.patch.price by user %s at /%s: %s", getCurrentUsername(), id, newPrice.toString()));
         return productRepository.findById(id)
                 .map(target -> productRepository.save(preparePatchPrice(target, newPrice)));
     }
 
     public Optional<Product> patchName(Long id, Product productWithNewName) {
-        logger.info(String.format("Audit Product.patch.name %d %s", id, productWithNewName.toString()));
+        logger.info(String.format("Audit Product.patch.name by user %s at /%s: %s", getCurrentUsername(), id, productWithNewName.toString()));
         return productRepository.findById(id)
                 .map(target -> productRepository.save(preparePatchName(target, productWithNewName)));
     }
 
     public void deleteById(Long id) {
-        logger.info(String.format("Audit Product.delete %d", id));
+        logger.info(String.format("Audit Product.delete by user %s at /%s", getCurrentUsername(), id));
         productRepository.deleteById(id);
     }
 
@@ -75,5 +77,13 @@ public class ProductService {
     public Product preparePatchName(Product product, Product productWithNewName) {
         product.setName(productWithNewName.getName());
         return product;
+    }
+
+    private String getCurrentUsername() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated()) {
+            return authentication.getName();
+        }
+        return "anonymous";
     }
 }
