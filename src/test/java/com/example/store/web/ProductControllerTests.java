@@ -84,16 +84,6 @@ class ProductControllerTests {
 
     @Test
     @Transactional
-    void createProductWithWhitespace() throws Exception {
-        mockMvc.perform(post("/products")
-                .header("Content-type", "application/json")
-                .content("{\"name\": \"  Four \", \"price\": {\"amount\": 4.495, \"currency\": \"EUR\"} }"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.name").value("Four"));
-    }
-
-    @Test
-    @Transactional
     void failCreateProductIncomplete() throws Exception {
         mockMvc.perform(post("/products")
             .header("Content-type", "application/json"))

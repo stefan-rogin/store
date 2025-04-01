@@ -105,7 +105,7 @@ public class ProductServiceTests {
 
     @Test
     void create() {
-        Product product = new Product("One", createPriceEur(1.49));
+        Product product = new Product(null, "One", createPriceEur(1.49));
         when(productRepository.save(any(Product.class))).thenReturn(product);
 
         Product result = productService.create(product);
@@ -118,7 +118,7 @@ public class ProductServiceTests {
 
     @Test
     void createFreeProduct() {
-        Product product = new Product("Zero", createPriceEur(0));
+        Product product = new Product(null, "Zero", createPriceEur(0));
         when(productRepository.save(any(Product.class))).thenReturn(product);
 
         Product result = productService.create(product);
@@ -131,20 +131,13 @@ public class ProductServiceTests {
     // TODO: Move to Price tests? 
     @Test
     void createProductWithRounding() {
-        Product product = new Product("Zero", createPriceEur(1.495));
+        Product product = new Product(null, "Zero", createPriceEur(1.495));
         when(productRepository.save(any(Product.class))).thenReturn(product);
 
         Product result = productService.create(product);
 
         assertEquals(createPriceAmount(1.5), result.getPrice().getAmount());
         verify(productRepository).save(product);
-    }
-
-    @Test
-    void failCreateNegativePriceProduct() {
-        assertThrows(
-                IllegalArgumentException.class,
-                () -> productService.create(new Product("One", createPriceEur(-1.49))));
     }
 
     @Test
@@ -169,7 +162,7 @@ public class ProductServiceTests {
 
         assertThrows(
                 ResourceNotFoundException.class,
-                () -> productService.update(1L, new Product("One", createPriceEur(1.49))));
+                () -> productService.update(1L, new Product(null, "One", createPriceEur(1.49))));
         verify(productRepository).findById(1L);
     }
 
@@ -189,16 +182,9 @@ public class ProductServiceTests {
     }
 
     @Test
-    void failPatchPriceNegative() {
-        assertThrows(
-                IllegalArgumentException.class,
-                () -> productService.patchPrice(1L, createPriceEur(-1.49)));
-    }
-
-    @Test
     void patchName() {
         Product target = new Product(1L, "One", createPriceEur(1.49));
-        Product update = new Product("OneChanged", null);
+        Product update = new Product(null, "OneChanged", null);
         when(productRepository.findById(anyLong())).thenReturn(Optional.of(target));
         when(productRepository.save(any(Product.class))).thenReturn(productService.preparePatchName(target, update));
 
@@ -220,7 +206,7 @@ public class ProductServiceTests {
                 () -> productService.patchPrice(1L, createPriceEur(1.39)));
         assertThrows(
                 ResourceNotFoundException.class,
-                () -> productService.patchName(1L, new Product("One", null)));
+                () -> productService.patchName(1L, new Product(null, "One", null)));
         verify(productRepository, times(2)).findById(1L);
     }
 

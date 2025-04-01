@@ -38,7 +38,7 @@ public class Price {
 
     public Price(BigDecimal amount, Currency currency) {
         setAmount(amount);
-        setCurrency(currency);;
+        this.currency = currency;
     }
 
     public BigDecimal getAmount() {
@@ -46,9 +46,6 @@ public class Price {
     }
 
     public void setAmount(BigDecimal amount) {
-        if (amount.compareTo(BigDecimal.ZERO) < 0) {
-            throw new IllegalArgumentException("Cannot create a negative price.");
-        }
         this.amount = amount.setScale(DEFAULT_SCALE, DEFAULT_ROUNDING_MODE);
     }
 
@@ -57,9 +54,6 @@ public class Price {
     }
 
     public void setCurrency(Currency currency) {
-        if (currency == null) {
-            throw new IllegalArgumentException("Cannot set a null currency.");
-        }
         this.currency = currency;
     }
 

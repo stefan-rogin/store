@@ -31,7 +31,7 @@ class ProductTests {
     @Test
     void constructorPartialValid() {
         Price price = createPriceEur(1.49);
-        Product product = new Product("One", price);
+        Product product = new Product(null, "One", price);
 
         assertNull(product.getId());
         assertEquals("One", product.getName());
@@ -79,8 +79,8 @@ class ProductTests {
     @Test
     void equalsAndHashCodeNullIds() {
         Price price = createPriceEur(1.49);
-        Product product1 = new Product("One", price);
-        Product product2 = new Product("One", price);
+        Product product1 = new Product(null, "One", price);
+        Product product2 = new Product(null, "One", price);
         Product product3 = new Product(1L, "One", price);
 
         assertEquals(product1, product2);

@@ -22,7 +22,6 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // TODO: Tests
     @NotBlank
     @Size(min = 1, max = MAX_NAME_SIZE)
     @Column(columnDefinition = "TEXT")
@@ -36,11 +35,6 @@ public class Product {
 
     }
 
-    public Product(String name, Price price) {
-        this.name = name.trim();
-        this.price = price;
-    }
-
     public Product(Long id, String name, Price price) {
         this.id = id;
         this.name = name;
@@ -52,7 +46,7 @@ public class Product {
     }
 
     public void setName(String name) {
-        this.name = name.trim();
+        this.name = name;
     }
 
     public Long getId() {
