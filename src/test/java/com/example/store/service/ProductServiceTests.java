@@ -5,9 +5,9 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -57,7 +57,6 @@ public class ProductServiceTests {
 
         Product result = productService.getById(1L);
 
-        assertNotNull(result);
         assertEquals("One", result.getName());
         assertEquals(createPriceAmount(1.49), result.getPrice().getAmount());
         assertEquals("EUR", result.getPrice().getCurrency().getCurrencyCode());
@@ -81,7 +80,6 @@ public class ProductServiceTests {
 
         List<Product> result = productService.list();
 
-        assertNotNull(result);
         assertEquals(3, result.size());
         assertEquals("One", result.get(0).getName());
         assertEquals("Two", result.get(1).getName());
@@ -101,7 +99,6 @@ public class ProductServiceTests {
 
         List<Product> result = productService.list();
 
-        assertNotNull(result);
         assertEquals(0, result.size());
         verify(productRepository).findAll();
     }
@@ -113,7 +110,6 @@ public class ProductServiceTests {
 
         Product result = productService.create(product);
 
-        assertNotNull(result);
         assertEquals("One", result.getName());
         assertEquals(createPriceAmount(1.49), result.getPrice().getAmount());
         assertEquals("EUR", result.getPrice().getCurrency().getCurrencyCode());
@@ -132,6 +128,7 @@ public class ProductServiceTests {
         verify(productRepository).save(product);
     }
 
+    // TODO: Move to Price tests? 
     @Test
     void createProductWithRounding() {
         Product product = new Product("Zero", createPriceEur(1.495));
@@ -145,8 +142,6 @@ public class ProductServiceTests {
 
     @Test
     void failCreateNegativePriceProduct() {
-        when(productRepository.save(any(Product.class))).thenReturn(null);
-
         assertThrows(
                 IllegalArgumentException.class,
                 () -> productService.create(new Product("One", createPriceEur(-1.49))));
@@ -155,32 +150,83 @@ public class ProductServiceTests {
     @Test
     void update() {
         Product target = new Product(1L, "One", createPriceEur(1.49));
-        Product update = new Product(1L, "OneChanged", createPriceEur(1.39));
-        when(productRepository.findById(1L)).thenReturn(Optional.of(target));
+        Product update = new Product(1L, "OneChanged", new Price(createPriceAmount(1.39), Currency.getInstance("RON")));
+        when(productRepository.findById(anyLong())).thenReturn(Optional.of(target));
         when(productRepository.save(any(Product.class))).thenReturn(productService.prepareUpdate(target, update));
 
         Product result = productService.update(1L, update);
 
-        assertNotNull(result);
         assertEquals("OneChanged", result.getName());
         assertEquals(createPriceAmount(1.39), result.getPrice().getAmount());
-        assertEquals("EUR", result.getPrice().getCurrency().getCurrencyCode());
+        assertEquals("RON", result.getPrice().getCurrency().getCurrencyCode());
         verify(productRepository).findById(1L);
         verify(productRepository).save(target);
     }
 
     @Test
     void failUpdateMissing() {
-        when(productRepository.findById(1L)).thenReturn(Optional.empty());
+        when(productRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         assertThrows(
                 ResourceNotFoundException.class,
                 () -> productService.update(1L, new Product("One", createPriceEur(1.49))));
+        verify(productRepository).findById(1L);
+    }
+
+    @Test
+    void patchPrice() {
+        Product target = new Product(1L, "One", createPriceEur(1.49));
+        Price update = new Price(createPriceAmount(1.39), Currency.getInstance("RON"));
+        when(productRepository.findById(anyLong())).thenReturn(Optional.of(target));
+        when(productRepository.save(any(Product.class))).thenReturn(productService.preparePatchPrice(target, update));
+
+        Product result = productService.patchPrice(1L, update);
+
+        assertEquals(createPriceAmount(1.39), result.getPrice().getAmount());
+        assertEquals("RON", result.getPrice().getCurrency().getCurrencyCode());
+        verify(productRepository).findById(1L);
+        verify(productRepository).save(target);
+    }
+
+    @Test
+    void failPatchPriceNegative() {
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> productService.patchPrice(1L, createPriceEur(-1.49)));
+    }
+
+    @Test
+    void patchName() {
+        Product target = new Product(1L, "One", createPriceEur(1.49));
+        Product update = new Product("OneChanged", null);
+        when(productRepository.findById(anyLong())).thenReturn(Optional.of(target));
+        when(productRepository.save(any(Product.class))).thenReturn(productService.preparePatchName(target, update));
+
+        Product result = productService.patchName(1L, update);
+
+        assertEquals("OneChanged", result.getName());
+        assertEquals(createPriceAmount(1.49), result.getPrice().getAmount());
+        assertEquals("EUR", result.getPrice().getCurrency().getCurrencyCode());
+        verify(productRepository).findById(1L);
+        verify(productRepository).save(target);
+    }
+    
+    @Test
+    void failPatchMissing() {
+        when(productRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        assertThrows(
+                ResourceNotFoundException.class,
+                () -> productService.patchPrice(1L, createPriceEur(1.39)));
+        assertThrows(
+                ResourceNotFoundException.class,
+                () -> productService.patchName(1L, new Product("One", null)));
+        verify(productRepository, times(2)).findById(1L);
     }
 
     @Test
     void deleteById() {
         productService.deleteById(1L);        
-        verify(productRepository, times(1)).deleteById(1L);
+        verify(productRepository).deleteById(1L);
     }
 }

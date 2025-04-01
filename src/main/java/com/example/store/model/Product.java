@@ -67,7 +67,6 @@ public class Product {
         return price;
     }
 
-    // TODO: Prevent currency change in model too?
     public void setPrice(Price price) {
         this.price = price;
     }

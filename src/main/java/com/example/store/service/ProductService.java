@@ -48,7 +48,7 @@ public class ProductService {
     }
 
     public Product patchName(Long id, Product productWithNewName) {
-        logger.info(String.format("Audit Product.patch.name %d %s", id, productWithNewName));
+        logger.info(String.format("Audit Product.patch.name %d %s", id, productWithNewName.toString()));
         return productRepository.findById(id)
                 .map(target -> productRepository.save(preparePatchName(target, productWithNewName))) 
                 .orElseThrow(() -> new ResourceNotFoundException("Product resource not found for id: " + id));

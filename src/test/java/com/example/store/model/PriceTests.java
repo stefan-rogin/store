@@ -50,8 +50,8 @@ class PriceTests {
 
     @Test
     void testToString() {
-        Price price = new Price(createPriceAmount(1.49), EUR_CURRENCY);
+        Price price = new Price(createPriceAmount(1), EUR_CURRENCY);
 
-        assertEquals("EUR 1.49", price.toString());
+        assertEquals("EUR 1.00", price.toString());
     }
 }

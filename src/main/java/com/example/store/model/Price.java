@@ -37,10 +37,7 @@ public class Price {
     }
 
     public Price(BigDecimal amount, Currency currency) {
-        if (amount.compareTo(BigDecimal.ZERO) < 0) {
-            throw new IllegalArgumentException("Cannot create a negative price.");
-        }
-        this.amount = amount.setScale(DEFAULT_SCALE, DEFAULT_ROUNDING_MODE);
+        setAmount(amount);
         this.currency = currency;
     }
 

@@ -120,6 +120,10 @@ class ProductControllerTests {
         mockMvc.perform(post("/products")
             .header("Content-type", "application/json")
             .content("{\"name\": \"Negative\", \"price\": {\"amount\": -4.49, \"currency\": \"EUR\"} }"))
+            .andExpect(status().isBadRequest());
+        mockMvc.perform(post("/products")
+            .header("Content-type", "application/json")
+            .content("{\"name\": \"Literal\", \"price\": {\"amount\": \"a\", \"currency\": \"EUR\"} }"))
             .andExpect(status().isBadRequest());    
     }
 
