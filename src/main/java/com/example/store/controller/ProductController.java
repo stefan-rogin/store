@@ -1,18 +1,15 @@
 package com.example.store.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.rest.webmvc.ResourceNotFoundException;
-import org.springframework.http.ResponseEntity;
+import org.springframework.web.ErrorResponseException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.validation.annotation.Validated;
+
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ProblemDetail;
 
 import com.example.store.service.ProductService;
 import com.example.store.model.Product;
@@ -21,8 +18,6 @@ import com.example.store.model.Price;
 @RestController
 @Validated
 public class ProductController {
-
-    private static final Logger logger = LoggerFactory.getLogger(ProductController.class);
 
     @Autowired
     private ProductService productService;
@@ -35,7 +30,7 @@ public class ProductController {
     @GetMapping("/products/{id}")
     public Product getById(@Positive @PathVariable Long id) {
         return productService.getById(id)
-            .orElseThrow(() -> new ResourceNotFoundException("Product resource not found for id: " + id));
+            .orElseThrow(() -> new ErrorResponseException(HttpStatus.NOT_FOUND));
     }
     
     @PostMapping("/products")
@@ -44,21 +39,21 @@ public class ProductController {
     }
 
     @PutMapping("/products/{id}")
-    public Product update(@Positive @PathVariable Long id, @Valid @RequestBody Product product) {
+    public Product update(@Positive @PathVariable Long id, @Valid @RequestBody Product product, HttpServletRequest request) {
         return productService.update(id, product)
-            .orElseThrow(() -> new ResourceNotFoundException("Product resource not found for id: " + id));
+            .orElseThrow(() -> new ErrorResponseException(HttpStatus.NOT_FOUND));
     }
 
     @PatchMapping("/products/{id}/price")
-    public Product patchPrice(@Positive @PathVariable Long id, @Valid @RequestBody Price newPrice) {
+    public Product patchPrice(@Positive @PathVariable Long id, @Valid @RequestBody Price newPrice, HttpServletRequest request) {
         return productService.patchPrice(id, newPrice)
-            .orElseThrow(() -> new ResourceNotFoundException("Product resource not found for id: " + id));
+            .orElseThrow(() -> new ErrorResponseException(HttpStatus.NOT_FOUND));
     }
 
     @PatchMapping("/products/{id}/name")
-    public Product patch(@Positive @PathVariable Long id, @Valid @RequestBody Product productWithNewName) {
+    public Product patch(@Positive @PathVariable Long id, @Valid @RequestBody Product productWithNewName, HttpServletRequest request) {
         return productService.patchName(id, productWithNewName)
-            .orElseThrow(() -> new ResourceNotFoundException("Product resource not found for id: " + id));
+            .orElseThrow(() -> new ErrorResponseException(HttpStatus.NOT_FOUND));
     }
         
     @DeleteMapping("/products/{id}")
