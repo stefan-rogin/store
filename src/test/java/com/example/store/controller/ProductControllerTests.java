@@ -1,4 +1,4 @@
-package com.example.store.web;
+package com.example.store.controller;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;

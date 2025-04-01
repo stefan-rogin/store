@@ -1,4 +1,4 @@
-package com.example.store.web;
+package com.example.store.controller;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
