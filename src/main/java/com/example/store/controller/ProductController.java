@@ -1,4 +1,4 @@
-package com.example.store.web;
+package com.example.store.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
