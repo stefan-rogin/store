@@ -1,10 +1,10 @@
 package com.example.store.service;
 
 import java.util.List;
+import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.example.store.repository.ProductRepository;
@@ -19,9 +19,8 @@ public class ProductService {
     @Autowired
     private ProductRepository productRepository;
 
-    public Product getById(Long id) {
-        return productRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Product resource not found for id: " + id));
+    public Optional<Product> getById(Long id) {
+        return productRepository.findById(id);
     }
 
     public List<Product> list() {
@@ -33,25 +32,22 @@ public class ProductService {
         return productRepository.save(product);
     }
 
-    public Product update(Long id, Product product) {
+    public Optional<Product> update(Long id, Product product) {
         logger.info(String.format("Audit Product.update %d %s", id, product.toString()));
         return productRepository.findById(id)
-                .map(target -> productRepository.save(prepareUpdate(target, product))) 
-                .orElseThrow(() -> new ResourceNotFoundException("Product resource not found for id: " + id));
+                .map(target -> productRepository.save(prepareUpdate(target, product)));
     }
 
-    public Product patchPrice(Long id, Price newPrice) {
+    public Optional<Product> patchPrice(Long id, Price newPrice) {
         logger.info(String.format("Audit Product.patch.price %d %s", id, newPrice.toString()));
         return productRepository.findById(id)
-                .map(target -> productRepository.save(preparePatchPrice(target, newPrice))) 
-                .orElseThrow(() -> new ResourceNotFoundException("Product resource not found for id: " + id));
+                .map(target -> productRepository.save(preparePatchPrice(target, newPrice)));
     }
 
-    public Product patchName(Long id, Product productWithNewName) {
+    public Optional<Product> patchName(Long id, Product productWithNewName) {
         logger.info(String.format("Audit Product.patch.name %d %s", id, productWithNewName.toString()));
         return productRepository.findById(id)
-                .map(target -> productRepository.save(preparePatchName(target, productWithNewName))) 
-                .orElseThrow(() -> new ResourceNotFoundException("Product resource not found for id: " + id));
+                .map(target -> productRepository.save(preparePatchName(target, productWithNewName)));
     }
 
     public void deleteById(Long id) {

@@ -34,7 +34,8 @@ public class ProductController {
 
     @GetMapping("/products/{id}")
     public Product getById(@Positive @PathVariable Long id) {
-        return productService.getById(id);
+        return productService.getById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("Product resource not found for id: " + id));
     }
     
     @PostMapping("/products")
@@ -44,17 +45,20 @@ public class ProductController {
 
     @PutMapping("/products/{id}")
     public Product update(@Positive @PathVariable Long id, @Valid @RequestBody Product product) {
-        return productService.update(id, product);
+        return productService.update(id, product)
+            .orElseThrow(() -> new ResourceNotFoundException("Product resource not found for id: " + id));
     }
 
     @PatchMapping("/products/{id}/price")
     public Product patchPrice(@Positive @PathVariable Long id, @Valid @RequestBody Price newPrice) {
-        return productService.patchPrice(id, newPrice);
+        return productService.patchPrice(id, newPrice)
+            .orElseThrow(() -> new ResourceNotFoundException("Product resource not found for id: " + id));
     }
 
     @PatchMapping("/products/{id}/name")
     public Product patch(@Positive @PathVariable Long id, @Valid @RequestBody Product productWithNewName) {
-        return productService.patchName(id, productWithNewName);
+        return productService.patchName(id, productWithNewName)
+            .orElseThrow(() -> new ResourceNotFoundException("Product resource not found for id: " + id));
     }
         
     @DeleteMapping("/products/{id}")

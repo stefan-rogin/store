@@ -5,10 +5,8 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -21,7 +19,6 @@ import java.util.Currency;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 
 import com.example.store.model.Price;
 import com.example.store.model.Product;
@@ -55,19 +52,12 @@ public class ProductServiceTests {
         when(productRepository.findById(1L))
             .thenReturn(Optional.of(new Product(1L, "One", price)));
 
-        Product result = productService.getById(1L);
+        Product result = productService.getById(1L).orElseThrow();
 
         assertEquals("One", result.getName());
         assertEquals(createPriceAmount(1.49), result.getPrice().getAmount());
         assertEquals("EUR", result.getPrice().getCurrency().getCurrencyCode());
         verify(productRepository).findById(1L);
-    }
-
-    @Test
-    void failGetByIdMissing() {
-        when(productRepository.findById(1L)).thenReturn(Optional.empty());
-
-        assertThrows(ResourceNotFoundException.class, () -> productService.getById(1L));
     }
 
     @Test
@@ -128,7 +118,6 @@ public class ProductServiceTests {
         verify(productRepository).save(product);
     }
 
-    // TODO: Move to Price tests? 
     @Test
     void createProductWithRounding() {
         Product product = new Product(null, "Zero", createPriceEur(1.495));
@@ -147,7 +136,7 @@ public class ProductServiceTests {
         when(productRepository.findById(anyLong())).thenReturn(Optional.of(target));
         when(productRepository.save(any(Product.class))).thenReturn(productService.prepareUpdate(target, update));
 
-        Product result = productService.update(1L, update);
+        Product result = productService.update(1L, update).orElseThrow();
 
         assertEquals("OneChanged", result.getName());
         assertEquals(createPriceAmount(1.39), result.getPrice().getAmount());
@@ -157,23 +146,13 @@ public class ProductServiceTests {
     }
 
     @Test
-    void failUpdateMissing() {
-        when(productRepository.findById(anyLong())).thenReturn(Optional.empty());
-
-        assertThrows(
-                ResourceNotFoundException.class,
-                () -> productService.update(1L, new Product(null, "One", createPriceEur(1.49))));
-        verify(productRepository).findById(1L);
-    }
-
-    @Test
     void patchPrice() {
         Product target = new Product(1L, "One", createPriceEur(1.49));
         Price update = new Price(createPriceAmount(1.39), Currency.getInstance("RON"));
         when(productRepository.findById(anyLong())).thenReturn(Optional.of(target));
         when(productRepository.save(any(Product.class))).thenReturn(productService.preparePatchPrice(target, update));
 
-        Product result = productService.patchPrice(1L, update);
+        Product result = productService.patchPrice(1L, update).orElseThrow();
 
         assertEquals(createPriceAmount(1.39), result.getPrice().getAmount());
         assertEquals("RON", result.getPrice().getCurrency().getCurrencyCode());
@@ -188,26 +167,13 @@ public class ProductServiceTests {
         when(productRepository.findById(anyLong())).thenReturn(Optional.of(target));
         when(productRepository.save(any(Product.class))).thenReturn(productService.preparePatchName(target, update));
 
-        Product result = productService.patchName(1L, update);
+        Product result = productService.patchName(1L, update).orElseThrow();
 
         assertEquals("OneChanged", result.getName());
         assertEquals(createPriceAmount(1.49), result.getPrice().getAmount());
         assertEquals("EUR", result.getPrice().getCurrency().getCurrencyCode());
         verify(productRepository).findById(1L);
         verify(productRepository).save(target);
-    }
-    
-    @Test
-    void failPatchMissing() {
-        when(productRepository.findById(anyLong())).thenReturn(Optional.empty());
-
-        assertThrows(
-                ResourceNotFoundException.class,
-                () -> productService.patchPrice(1L, createPriceEur(1.39)));
-        assertThrows(
-                ResourceNotFoundException.class,
-                () -> productService.patchName(1L, new Product(null, "One", null)));
-        verify(productRepository, times(2)).findById(1L);
     }
 
     @Test
