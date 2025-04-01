@@ -33,7 +33,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             @NonNull HttpHeaders headers,
             @NonNull HttpStatusCode statusCode,
             @NonNull WebRequest request) {
-        logger.error(ex.getMessage());
+        logger.warn(ex.getMessage());
         return super.handleExceptionInternal(ex, body, headers, statusCode, request);
     }
 }

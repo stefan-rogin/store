@@ -66,12 +66,4 @@ public class ProductController {
         productService.deleteById(id);
     }
 
-    @ExceptionHandler(ResourceNotFoundException.class)
-    private ResponseEntity<?> handleResourceNotFoundException(ResourceNotFoundException ex) {
-        ProblemDetail detail = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getLocalizedMessage());
-        // Likely client error
-        logger.warn(ex.getMessage());
-        return new ResponseEntity<>(detail, HttpStatus.NOT_FOUND);
-    }
-
 }
