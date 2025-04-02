@@ -33,10 +33,12 @@ class ProductTests {
         product.setId(1L);
         product.setName("One");
         product.setPrice(price);
+        product.setResId("33b5785c-8d8a-4301-b5b3-b07b67347173");
 
         assertEquals(1L, product.getId());
         assertEquals("One", product.getName());
         assertEquals(price, product.getPrice());
+        assertEquals("33b5785c-8d8a-4301-b5b3-b07b67347173", product.getResId());
     }
 
     @Test

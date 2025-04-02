@@ -18,6 +18,7 @@ import org.mockito.MockitoAnnotations;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -59,16 +60,19 @@ public class ProductServiceTests {
             case "One":
                 product.setId(1L);
                 product.setName("One");
+                product.setResId("33b5785c-8d8a-4301-b5b3-b07b67347173");
                 product.setPrice(createPriceEur(1.49));
                 break;
             case "Two":
                 product.setId(2L);
                 product.setName("Two");
+                product.setResId("a18920fb-56cd-41c5-8264-ed617c038524");
                 product.setPrice(createPriceEur(2.49));
                 break;
             case "Three":
                 product.setId(3L);
                 product.setName("Three");
+                product.setResId("410d3bbb-67f1-479c-81b0-a852e6579eb4");
                 product.setPrice(createPriceEur(3.49));
                 break;
             default:
@@ -83,8 +87,7 @@ public class ProductServiceTests {
     @Test
     void findById() {
         Product target = createTestProduct("One");
-        when(productRepository.findById(anyLong()))
-                .thenReturn(Optional.of(target));
+        when(productRepository.findById(anyLong())).thenReturn(Optional.of(target));
 
         Product result = productService.findById(1L).orElseThrow();
 
@@ -92,6 +95,19 @@ public class ProductServiceTests {
         assertEquals(createPriceAmount(1.49), result.getPrice().getAmount());
         assertEquals("EUR", result.getPrice().getCurrency().getCurrencyCode());
         verify(productRepository).findById(1L);
+    }
+
+    @Test
+    void findByResId() {
+        Product target = createTestProduct("One");
+        when(productRepository.findByResId(anyString())).thenReturn(Optional.of(target));
+
+        Product result = productService.findByResId(target.getResId()).orElseThrow();
+
+        assertEquals("One", result.getName());
+        assertEquals(createPriceAmount(1.49), result.getPrice().getAmount());
+        assertEquals("EUR", result.getPrice().getCurrency().getCurrencyCode());
+        verify(productRepository).findByResId(target.getResId());
     }
 
     @Test
@@ -138,7 +154,7 @@ public class ProductServiceTests {
                 createTestProduct("Three apples")));
         when(productRepository.search("Apple", pageable)).thenReturn(products);
 
-        Page<Product> results = productRepository.search("Apple", pageable);
+        Page<Product> results = productService.search("Apple", pageable);
 
         assertEquals(3, results.getSize());
         verify(productRepository).search("Apple", pageable);
@@ -183,23 +199,40 @@ public class ProductServiceTests {
     }
 
     @Test
-    void update() {
+    void upsertForExisting() {
         Price updatedPrice = createPriceEur(1.39);
         updatedPrice.setCurrency(Currency.getInstance("RON"));
 
         Product target = createTestProduct("One");
         Product update = createTestProduct("OneChanged");
         update.setPrice(updatedPrice);
-        when(productRepository.findById(anyLong())).thenReturn(Optional.of(target));
+        when(productRepository.findByResId(anyString())).thenReturn(Optional.of(target));
         when(productRepository.save(any(Product.class))).thenReturn(ProductUpdater.prepareUpdate(target, update));
 
-        Product result = productService.update(1L, update).orElseThrow();
+        Product result = productService.upsert(target.getResId(), update);
 
         assertEquals("OneChanged", result.getName());
         assertEquals(createPriceAmount(1.39), result.getPrice().getAmount());
         assertEquals("RON", result.getPrice().getCurrency().getCurrencyCode());
-        verify(productRepository).findById(1L);
+        verify(productRepository).findByResId(target.getResId());
         verify(productRepository).save(target);
+    }
+
+    @Test
+    void upsertForNew() {
+        Price price = createPriceEur(4.49);
+        Product newProduct = createTestProduct("Four");
+        newProduct.setPrice(price);
+        when(productRepository.findByResId(anyString())).thenReturn(Optional.empty());
+        when(productRepository.save(any(Product.class))).thenReturn(newProduct);
+
+        Product result = productService.upsert(newProduct.getResId(), newProduct);
+
+        assertEquals("Four", result.getName());
+        assertEquals(createPriceAmount(4.49), result.getPrice().getAmount());
+        assertEquals("EUR", result.getPrice().getCurrency().getCurrencyCode());
+        verify(productRepository).findByResId(newProduct.getResId());
+        verify(productRepository).save(newProduct);
     }
 
     @Test
@@ -208,15 +241,15 @@ public class ProductServiceTests {
         updatedPrice.setCurrency(Currency.getInstance("RON"));
 
         Product target = createTestProduct("One");
-        when(productRepository.findById(anyLong())).thenReturn(Optional.of(target));
+        when(productRepository.findByResId(anyString())).thenReturn(Optional.of(target));
         when(productRepository.save(any(Product.class)))
                 .thenReturn(ProductUpdater.preparePatchPrice(target, updatedPrice));
 
-        Product result = productService.patchPrice(1L, updatedPrice).orElseThrow();
+        Product result = productService.patchPrice(target.getResId(), updatedPrice).orElseThrow();
 
         assertEquals(createPriceAmount(1.39), result.getPrice().getAmount());
         assertEquals("RON", result.getPrice().getCurrency().getCurrencyCode());
-        verify(productRepository).findById(1L);
+        verify(productRepository).findByResId(target.getResId());
         verify(productRepository).save(target);
     }
 
@@ -226,23 +259,23 @@ public class ProductServiceTests {
         Product updatedHavingNullPrice = createTestProduct("OneChanged");
         updatedHavingNullPrice.setPrice(null);
 
-        when(productRepository.findById(anyLong())).thenReturn(Optional.of(target));
+        when(productRepository.findByResId(anyString())).thenReturn(Optional.of(target));
         when(productRepository.save(any(Product.class)))
                 .thenReturn(ProductUpdater.preparePatchName(target, updatedHavingNullPrice));
 
-        Product result = productService.patchName(1L, updatedHavingNullPrice).orElseThrow();
+        Product result = productService.patchName(target.getResId(), updatedHavingNullPrice).orElseThrow();
 
         assertEquals("OneChanged", result.getName());
         // Assert that the price is not changed
         assertEquals(createPriceAmount(1.49), result.getPrice().getAmount());
         assertEquals("EUR", result.getPrice().getCurrency().getCurrencyCode());
-        verify(productRepository).findById(1L);
+        verify(productRepository).findByResId(target.getResId());
         verify(productRepository).save(target);
     }
 
     @Test
     void deleteById() {
-        productService.deleteById(1L);
-        verify(productRepository).deleteById(1L);
+        productService.deleteByResId("33b5785c-8d8a-4301-b5b3-b07b67347173");
+        verify(productRepository).deleteByResId("33b5785c-8d8a-4301-b5b3-b07b67347173");
     }
 }

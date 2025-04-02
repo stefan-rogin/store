@@ -16,6 +16,7 @@ public interface ProductRepository extends CrudRepository<Product, Long> {
 
     Page<Product> findAll(Pageable pageable);
 
-    @Query("select p from Product p where resId = :resId")
     Optional<Product> findByResId(@Param("resId") String resId);
+
+    void deleteByResId(@Param("resId") String resId);
 }

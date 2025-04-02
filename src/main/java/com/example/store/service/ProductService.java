@@ -21,7 +21,7 @@ public class ProductService {
         return productRepository.findById(id);
     }
 
-    public Optional<Product> findByresId(String resId) {
+    public Optional<Product> findByResId(String resId) {
         return productRepository.findByResId(resId);
     }
 
@@ -37,11 +37,6 @@ public class ProductService {
         return productRepository.save(product);
     }
 
-    public Optional<Product> update(Long id, Product product) {
-        return productRepository.findById(id)
-                .map(target -> productRepository.save(ProductUpdater.prepareUpdate(target, product)));
-    }
-
     public Product upsert(String resId, Product product) {
         return productRepository.findByResId(resId)
                 .map(target -> productRepository.save(ProductUpdater.prepareUpdate(target, product)))
@@ -51,17 +46,17 @@ public class ProductService {
                 });
     }
 
-    public Optional<Product> patchPrice(Long id, Price newPrice) {
-        return productRepository.findById(id)
+    public Optional<Product> patchPrice(String resId, Price newPrice) {
+        return productRepository.findByResId(resId)
                 .map(target -> productRepository.save(ProductUpdater.preparePatchPrice(target, newPrice)));
     }
 
-    public Optional<Product> patchName(Long id, Product productWithNewName) {
-        return productRepository.findById(id)
+    public Optional<Product> patchName(String resId, Product productWithNewName) {
+        return productRepository.findByResId(resId)
                 .map(target -> productRepository.save(ProductUpdater.preparePatchName(target, productWithNewName)));
     }
 
-    public void deleteById(Long id) {
-        productRepository.deleteById(id);
+    public void deleteByResId(String resId) {
+        productRepository.deleteByResId(resId);
     }
 }

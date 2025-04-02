@@ -31,8 +31,8 @@ public class ProductController {
     }
 
     @GetMapping("/products/{resId}")
-    public Product findById(@UUID @PathVariable String resId) {
-        return productService.findByresId(resId)
+    public Product findResById(@UUID @PathVariable String resId) {
+        return productService.findByResId(resId)
             .orElseThrow(() -> new ErrorResponseException(HttpStatus.NOT_FOUND));
     }
     
@@ -53,21 +53,21 @@ public class ProductController {
         return productService.upsert(resId, product);
     }
 
-    @PatchMapping("/products/{id}/price")
-    public Product patchPrice(@Positive @PathVariable Long id, @Valid @RequestBody Price newPrice, HttpServletRequest request) {
-        return productService.patchPrice(id, newPrice)
+    @PatchMapping("/products/{resId}/price")
+    public Product patchPrice(@UUID @PathVariable String resId, @Valid @RequestBody Price newPrice, HttpServletRequest request) {
+        return productService.patchPrice(resId, newPrice)
             .orElseThrow(() -> new ErrorResponseException(HttpStatus.NOT_FOUND));
     }
 
-    @PatchMapping("/products/{id}/name")
-    public Product patch(@Positive @PathVariable Long id, @Valid @RequestBody Product productWithNewName, HttpServletRequest request) {
-        return productService.patchName(id, productWithNewName)
+    @PatchMapping("/products/{resId}/name")
+    public Product patchName(@UUID @PathVariable String resId, @Valid @RequestBody Product productWithNewName, HttpServletRequest request) {
+        return productService.patchName(resId, productWithNewName)
             .orElseThrow(() -> new ErrorResponseException(HttpStatus.NOT_FOUND));
     }
         
-    @DeleteMapping("/products/{id}")
-    public void deleteById(@Positive @PathVariable Long id) {
-        productService.deleteById(id);
+    @DeleteMapping("/products/{resId}")
+    public void deleteById(@UUID @PathVariable String resId) {
+        productService.deleteByResId(resId);
     }
 
 }
