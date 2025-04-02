@@ -24,6 +24,7 @@ import static org.mockito.Mockito.when;
 import com.example.store.model.Price;
 import com.example.store.model.Product;
 import com.example.store.repository.ProductRepository;
+import com.example.store.util.ProductUpdater;
 
 @SpringBootTest
 public class ProductServiceTests {
@@ -190,7 +191,7 @@ public class ProductServiceTests {
         Product update = createTestProduct("OneChanged");
         update.setPrice(updatedPrice);
         when(productRepository.findById(anyLong())).thenReturn(Optional.of(target));
-        when(productRepository.save(any(Product.class))).thenReturn(productService.prepareUpdate(target, update));
+        when(productRepository.save(any(Product.class))).thenReturn(ProductUpdater.prepareUpdate(target, update));
 
         Product result = productService.update(1L, update).orElseThrow();
 
@@ -209,7 +210,7 @@ public class ProductServiceTests {
         Product target = createTestProduct("One");
         when(productRepository.findById(anyLong())).thenReturn(Optional.of(target));
         when(productRepository.save(any(Product.class)))
-                .thenReturn(productService.preparePatchPrice(target, updatedPrice));
+                .thenReturn(ProductUpdater.preparePatchPrice(target, updatedPrice));
 
         Product result = productService.patchPrice(1L, updatedPrice).orElseThrow();
 
@@ -227,7 +228,7 @@ public class ProductServiceTests {
 
         when(productRepository.findById(anyLong())).thenReturn(Optional.of(target));
         when(productRepository.save(any(Product.class)))
-                .thenReturn(productService.preparePatchName(target, updatedHavingNullPrice));
+                .thenReturn(ProductUpdater.preparePatchName(target, updatedHavingNullPrice));
 
         Product result = productService.patchName(1L, updatedHavingNullPrice).orElseThrow();
 

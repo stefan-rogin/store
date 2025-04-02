@@ -24,10 +24,6 @@ public class User {
     @ManyToMany(fetch = FetchType.EAGER)
     private Set<Role> roles;
 
-    public Long getId() {
-        return id;
-    }
-
     public String getUsername() {
         return username;
     }
