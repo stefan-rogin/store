@@ -145,7 +145,7 @@ class ProductControllerTests {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("ThreeChanged"))
                 .andExpect(jsonPath("$.price.amount").value(3.39))
-                .andExpect(jsonPath("$.price.currency").value("EUR"));
+                .andExpect(jsonPath("$.price.currency").value("RON"));
         mockMvc.perform(get("/products/3"))
                 .andExpect(jsonPath("$.name").value("ThreeChanged"))
                 .andExpect(jsonPath("$.price.amount").value(3.39))
@@ -196,7 +196,7 @@ class ProductControllerTests {
                 .header("Content-type", "application/json")
                 .content("{\"amount\": 3.99, \"currency\": \"EUR\"}"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$name").value("Three"))
+                .andExpect(jsonPath("$.name").value("Three"))
                 .andExpect(jsonPath("$.price.amount").value(3.99));
         mockMvc.perform(patch("/products/2/price")
                 .header("Content-type", "application/json")
