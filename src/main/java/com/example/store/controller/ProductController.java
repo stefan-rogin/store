@@ -1,5 +1,6 @@
 package com.example.store.controller;
 
+import org.hibernate.validator.constraints.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.ErrorResponseException;
 import org.springframework.web.bind.annotation.*;
@@ -29,9 +30,9 @@ public class ProductController {
         return productService.list(pageable);
     }
 
-    @GetMapping("/products/{id}")
-    public Product getById(@Positive @PathVariable Long id) {
-        return productService.getById(id)
+    @GetMapping("/products/{resId}")
+    public Product findById(@UUID @PathVariable String resId) {
+        return productService.findByresId(resId)
             .orElseThrow(() -> new ErrorResponseException(HttpStatus.NOT_FOUND));
     }
     
@@ -47,10 +48,9 @@ public class ProductController {
         return productService.create(product);
     }
 
-    @PutMapping("/products/{id}")
-    public Product update(@Positive @PathVariable Long id, @Valid @RequestBody Product product, HttpServletRequest request) {
-        return productService.update(id, product)
-            .orElseThrow(() -> new ErrorResponseException(HttpStatus.NOT_FOUND));
+    @PutMapping("/products/{resId}")
+    public Product upsert(@UUID @PathVariable String resId, @Valid @RequestBody Product product, HttpServletRequest request) {
+        return productService.upsert(resId, product);
     }
 
     @PatchMapping("/products/{id}/price")

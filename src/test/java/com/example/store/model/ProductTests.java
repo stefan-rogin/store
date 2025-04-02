@@ -20,6 +20,7 @@ class ProductTests {
         Product product = new Product();
         product.setId(1L);
         product.setName("One");
+        product.setResId("33b5785c-8d8a-4301-b5b3-b07b67347173");
         product.setPrice(createPriceEur(1.49));
         return product;
     }
@@ -98,9 +99,9 @@ class ProductTests {
     @Test
     void testToString() {
         Product product = createProductOne();
-        assertEquals("[1] One", product.toString());
+        assertEquals("[1][33b5785c-8d8a-4301-b5b3-b07b67347173][One][EUR 1.49]", product.toString());
 
         product.setId(null);
-        assertEquals("[null] One", product.toString());
+        assertEquals("[null][33b5785c-8d8a-4301-b5b3-b07b67347173][One][EUR 1.49]", product.toString());
     }
 }

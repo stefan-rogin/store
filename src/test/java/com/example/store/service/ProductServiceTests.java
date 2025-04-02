@@ -81,12 +81,12 @@ public class ProductServiceTests {
     }
 
     @Test
-    void getById() {
+    void findById() {
         Product target = createTestProduct("One");
         when(productRepository.findById(anyLong()))
                 .thenReturn(Optional.of(target));
 
-        Product result = productService.getById(1L).orElseThrow();
+        Product result = productService.findById(1L).orElseThrow();
 
         assertEquals("One", result.getName());
         assertEquals(createPriceAmount(1.49), result.getPrice().getAmount());

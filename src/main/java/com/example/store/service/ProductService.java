@@ -17,8 +17,12 @@ public class ProductService {
     @Autowired
     private ProductRepository productRepository;
 
-    public Optional<Product> getById(Long id) {
+    public Optional<Product> findById(Long id) {
         return productRepository.findById(id);
+    }
+
+    public Optional<Product> findByresId(String resId) {
+        return productRepository.findByResId(resId);
     }
 
     public Page<Product> list(Pageable pageable) {
@@ -36,6 +40,15 @@ public class ProductService {
     public Optional<Product> update(Long id, Product product) {
         return productRepository.findById(id)
                 .map(target -> productRepository.save(ProductUpdater.prepareUpdate(target, product)));
+    }
+
+    public Product upsert(String resId, Product product) {
+        return productRepository.findByResId(resId)
+                .map(target -> productRepository.save(ProductUpdater.prepareUpdate(target, product)))
+                .orElseGet(() -> {
+                    product.setResId(resId);
+                    return productRepository.save(product);
+                });
     }
 
     public Optional<Product> patchPrice(Long id, Price newPrice) {

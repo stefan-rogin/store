@@ -1,5 +1,6 @@
 package com.example.store.repository;
 
+import java.util.Optional;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -14,4 +15,7 @@ public interface ProductRepository extends CrudRepository<Product, Long> {
     Page<Product> search(@Param("searchTerm") String searchTerm, Pageable pageable);
 
     Page<Product> findAll(Pageable pageable);
+
+    @Query("select p from Product p where resId = :resId")
+    Optional<Product> findByResId(@Param("resId") String resId);
 }

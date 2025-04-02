@@ -5,12 +5,17 @@ import jakarta.persistence.*;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import org.hibernate.validator.constraints.UUID;
 
 @Entity
 @SoftDelete
 public class Product {
 
     public static final int MAX_NAME_SIZE = 2000;
+
+    public Product() {
+        this.resId = java.util.UUID.randomUUID().toString();
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,6 +29,18 @@ public class Product {
     @Valid
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     private Price price;
+
+    @UUID
+    @Column(unique = true, nullable = false)
+    private String resId;
+
+    public String getResId() {
+        return resId;
+    }
+
+    public void setResId(String resId) {
+        this.resId = resId;
+    }
 
     public String getName() {
         return name;
@@ -67,7 +84,7 @@ public class Product {
 
     @Override
     public String toString() {
-        return String.format("[%s] %s", id == null ? "null" : id, name);
+        return String.format("[%s][%s][%s][%s]", id == null ? "null" : id, resId, name, price);
     }
 
 }
