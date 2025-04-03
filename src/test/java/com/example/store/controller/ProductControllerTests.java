@@ -74,7 +74,7 @@ class ProductControllerTests {
     void searchWithResults() throws Exception {
         mockMvc.perform(get("/products/search?searchTerm=oil"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.numberOfElements").value(2))
+                .andExpect(jsonPath("$.totalElements").value(2))
                 .andExpect(jsonPath("$.content[0].name").value("Cooking Oil"))
                 .andExpect(jsonPath("$.content[1].name").value("Engine Oil"))
                 .andExpect(jsonPath("$.content[0].price.amount").value(4.99))

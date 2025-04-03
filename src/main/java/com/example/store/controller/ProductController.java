@@ -8,7 +8,6 @@ import org.springframework.validation.annotation.Validated;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Positive;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -16,6 +15,7 @@ import org.springframework.http.HttpStatus;
 
 import com.example.store.service.ProductService;
 import com.example.store.model.Product;
+import com.example.store.dto.PaginatedResponse;
 import com.example.store.model.Price;
 
 @RestController
@@ -25,9 +25,21 @@ public class ProductController {
     @Autowired
     private ProductService productService;
 
+    // TODO: Extract PaginatedResponse
     @GetMapping("/products")
-    public Page<Product> list(@PageableDefault(size = 10, sort = "name") Pageable pageable) {
-        return productService.list(pageable);
+    public PaginatedResponse<Product> list(
+            @PageableDefault(size = 10, sort = "name") Pageable pageable) {
+
+        Page<Product> products = productService.list(pageable);
+
+        PaginatedResponse<Product> response = new PaginatedResponse<>();
+        response.setContent(products.getContent());
+        response.setPageNumber(products.getNumber());
+        response.setPageSize(products.getSize());
+        response.setTotalElements(products.getTotalElements());
+        response.setTotalPages(products.getTotalPages());
+
+        return response;
     }
 
     @GetMapping("/products/{resId}")
@@ -37,10 +49,19 @@ public class ProductController {
     }
     
     @GetMapping("/products/search")
-    public Page<Product> search(
+    public PaginatedResponse<Product> search(
             @RequestParam(required = false) String searchTerm,
             @PageableDefault(size = 10, sort = "name") Pageable pageable) {
-        return productService.search(searchTerm, pageable);
+                
+        Page<Product> products = productService.search(searchTerm, pageable);
+        PaginatedResponse<Product> response = new PaginatedResponse<>();
+        response.setContent(products.getContent());
+        response.setPageNumber(products.getNumber());
+        response.setPageSize(products.getSize());
+        response.setTotalElements(products.getTotalElements());
+        response.setTotalPages(products.getTotalPages());
+
+        return response;
     }
 
     @PostMapping("/products")
