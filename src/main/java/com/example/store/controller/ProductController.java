@@ -16,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import com.example.store.service.ProductService;
 import com.example.store.model.Product;
 import com.example.store.dto.PaginatedResponse;
+import com.example.store.log.Auditable;
 import com.example.store.model.Price;
 
 @RestController
@@ -51,28 +52,33 @@ public class ProductController {
         return PaginatedResponse.of(products);
     }
 
+    @Auditable
     @PostMapping("/products")
     public Product create(@Valid @RequestBody Product product) {
         return productService.create(product);
     }
 
+    @Auditable
     @PutMapping("/products/{id}")
     public Product upsert(@PathVariable UUID id, @Valid @RequestBody Product product, HttpServletRequest request) {
         return productService.upsert(id, product);
     }
 
+    @Auditable
     @PatchMapping("/products/{id}/price")
     public Product patchPrice(@PathVariable UUID id, @Valid @RequestBody Price newPrice, HttpServletRequest request) {
         return productService.patchPrice(id, newPrice)
             .orElseThrow(() -> new ErrorResponseException(HttpStatus.NOT_FOUND));
     }
 
+    @Auditable
     @PatchMapping("/products/{id}/name")
     public Product patchName(@PathVariable UUID id, @Valid @RequestBody Product productWithNewName, HttpServletRequest request) {
         return productService.patchName(id, productWithNewName)
             .orElseThrow(() -> new ErrorResponseException(HttpStatus.NOT_FOUND));
     }
         
+    @Auditable
     @DeleteMapping("/products/{id}")
     public void deleteById(@PathVariable UUID id) {
         productService.deleteById(id);
