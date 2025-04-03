@@ -23,6 +23,7 @@ import com.example.store.model.Price;
 public class ProductController {
 
     private static final int PAGE_SIZE = 10;
+    private static final String PAGE_SORT = "name";
 
     @Autowired
     private ProductService productService;
@@ -30,7 +31,7 @@ public class ProductController {
     // TODO: Extract PaginatedResponse
     @GetMapping("/products")
     public PaginatedResponse<Product> list(
-            @PageableDefault(size = PAGE_SIZE, sort = "name") Pageable pageable) {
+            @PageableDefault(size = PAGE_SIZE, sort = PAGE_SORT) Pageable pageable) {
 
         Page<Product> products = productService.list(pageable);
 
@@ -53,7 +54,7 @@ public class ProductController {
     @GetMapping("/products/search")
     public PaginatedResponse<Product> search(
             @RequestParam(required = false) String searchTerm,
-            @PageableDefault(size = 10, sort = "name") Pageable pageable) {
+            @PageableDefault(size = PAGE_SIZE, sort = PAGE_SORT) Pageable pageable) {
                 
         Page<Product> products = productService.search(searchTerm, pageable);
         PaginatedResponse<Product> response = new PaginatedResponse<>();

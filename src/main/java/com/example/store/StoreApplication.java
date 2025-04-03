@@ -7,6 +7,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.example.store.security.model.User;
@@ -28,6 +29,7 @@ public class StoreApplication {
 	private String ENV_USER_DEFAULT_PASS;
 
 	@Bean
+	@Profile("!IntegrationTest")
     public CommandLineRunner insertDefaultUsers(
 			UserRepository userRepository, RoleRepository reolRepository, PasswordEncoder passwordEncoder) {
         return args -> {
