@@ -3,6 +3,9 @@ package com.example.store.util;
 import com.example.store.model.Product;
 import com.example.store.model.Price;
 
+/**
+ * Utillity class that is in support for product operations
+ */
 public class ProductUpdater {
 
     public static Product prepareUpdate(Product target, Product update) {

@@ -69,9 +69,9 @@ class ProductTests {
     void testToString() {
         Product product = createProductOne();
         String expectedId = product.getId().toString();
-        assertEquals(String.format("{[%s][One][{EUR 1.49}]}", expectedId), product.toString());
+        assertEquals(String.format("[%s][One][[EUR 1.49]]", expectedId), product.toString());
 
         product.setId(null);
-        assertEquals("{[null][One][{EUR 1.49}]}", product.toString());
+        assertEquals("[null][One][[EUR 1.49]]", product.toString());
     }
 }

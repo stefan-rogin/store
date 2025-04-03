@@ -14,6 +14,9 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import com.example.store.security.model.User;
 import com.example.store.security.repository.UserRepository;
 
+/**
+ * Service for SecurityConfig
+ */
 @Service
 public class UserDetailServiceImpl implements UserDetailsService {
 

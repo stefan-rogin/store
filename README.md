@@ -7,6 +7,8 @@ The pre-required packages for building the application from source code are JDK 
 
 ## Overview
 
+Generally, endpoinds respond with the serialized resource being created/updated.
+
 ### Endpoints
 
 ```
@@ -38,9 +40,15 @@ Controllers have integration tests that use the start-up data set for harness. S
 
 ### Error handling and logging
 
-Errors handling is centralized in a `GlobalExceptionHandler` class that extends Spring's `ResponseEntityExceptionHandler`, as it provides functionality specialized for web services. Method `handleExceptionInternal` is overriden to log encountered errors. A catch-all Exception handler is implemented as a last resort interceptor for any unhandled runtime exceptions, that will log, then generate a `ProblemDetail` response, but without passing any sensitive information.
+Errors handling is centralized in a `GlobalExceptionHandler` class that extends Spring's `ResponseEntityExceptionHandler`, as it provides functionality specialized for web services. Method `handleExceptionInternal` is overriden to log encountered errors. A catch-all Exception handler is implemented as a last resort interceptor for any unhandled runtime exceptions, that will log, then generate a `ProblemDetail` response, but without passing any sensitive information. 
 
-For a more in-depth view, the code contains comments and briefs on classes.
+Actions changing the DB are traced in a separate `audit.log` file, logging method called, user and arguments.
+
+### Other remarks
+- For supporting assignable IDs for products, UUID was preferred for this entity's identifier.
+- Utf-8 is configured as charset encoding through application.properties.
+- The service only accepts application/json requests (except login/logout and /)
+- For a deeper dive, there are comments and class briefs in the code.
 
 ## Examples
 

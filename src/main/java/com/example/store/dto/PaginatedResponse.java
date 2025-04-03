@@ -17,7 +17,7 @@ public class PaginatedResponse<T> {
     private long totalElements;
     private int totalPages;
 
-    /// Map page to PaginatedResponse
+    // Map page to PaginatedResponse
     public static PaginatedResponse<Product> of(Page<Product> products) {
 
         PaginatedResponse<Product> response = new PaginatedResponse<>();
@@ -30,7 +30,7 @@ public class PaginatedResponse<T> {
         return response;
     }
 
-    /// Getters and setters
+    // Getters and setters
     public List<T> getContent() {
         return content;
     }

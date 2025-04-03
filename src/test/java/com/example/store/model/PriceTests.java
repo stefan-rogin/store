@@ -64,6 +64,6 @@ class PriceTests {
 
     @Test
     void testToString() {
-        assertEquals("{EUR 1.00}", createPriceEur(1.00).toString());
+        assertEquals("[EUR 1.00]", createPriceEur(1.00).toString());
     }
 }

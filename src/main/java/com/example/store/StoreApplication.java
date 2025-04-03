@@ -16,6 +16,9 @@ import com.example.store.security.model.Role;
 import com.example.store.security.repository.UserRepository;
 import com.example.store.security.repository.RoleRepository;
 
+/**
+ * Application class. It contains a start-up bean that creates the demo users and roles.
+ */
 @SpringBootApplication
 public class StoreApplication {
 

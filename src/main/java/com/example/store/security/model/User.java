@@ -10,6 +10,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 
+/**
+ * Entity for users. It has a M:M relation with Roles.
+ */
 @Entity
 @Table(name = "users")
 public class User {
