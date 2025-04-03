@@ -1,5 +1,5 @@
 # Store web service
-Demo project for evaluation. It's a simplistic representation of a store, having products with prices. The project is built with SpringBoot and it's limited to exposing a REST web service, without any UI.
+Demo project for evaluation. It's a simplistic representation of a store, having products with prices. The project is built with SpringBoot and it's limited to exposing a REST web service, without any UI. For persistence, it uses an H2 in-memory test database, so the application resets to its initial state with each restart.
 
 ## Setup
 
@@ -7,7 +7,7 @@ The pre-required packages for building the application from source code are JDK 
 
 ## Overview
 
-Generally, endpoinds respond with the serialized resource being created/updated.
+Generally, endpoints respond with the serialized resource being created/updated.
 
 ### Endpoints
 
@@ -40,7 +40,7 @@ Controllers have integration tests that use the start-up data set for harness. S
 
 ### Error handling and logging
 
-Errors handling is centralized in a `GlobalExceptionHandler` class that extends Spring's `ResponseEntityExceptionHandler`, as it provides functionality specialized for web services. Method `handleExceptionInternal` is overriden to log encountered errors. A catch-all Exception handler is implemented as a last resort interceptor for any unhandled runtime exceptions, that will log, then generate a `ProblemDetail` response, but without passing any sensitive information. 
+Errors handling is centralized in a `GlobalExceptionHandler` class that extends Spring's `ResponseEntityExceptionHandler`, as it provides functionality specialized for web services. Method `handleExceptionInternal` is overridden to log encountered errors. A catch-all Exception handler is implemented as a last resort interceptor for any unhandled runtime exceptions, that will log, then generate a `ProblemDetail` response, but without passing any sensitive information. 
 
 Actions changing the DB are traced in a separate `audit.log` file, logging method called, user and arguments.
 
@@ -56,7 +56,8 @@ Actions changing the DB are traced in a separate `audit.log` file, logging metho
 ```
 curl -X POST http://localhost:8080/login -d "username=user&password=user" \
 -w "\n Status: %{http_code}\n" --cookie-jar cookies.txt 
-
+```
+```
 curl -X POST http://localhost:8080/login -d "username=admin&password=admin" \
  -w "\n Status: %{http_code}\n" --cookie-jar cookies.txt 
 ```
