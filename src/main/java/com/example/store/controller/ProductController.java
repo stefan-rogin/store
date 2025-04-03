@@ -28,21 +28,12 @@ public class ProductController {
     @Autowired
     private ProductService productService;
 
-    // TODO: Extract PaginatedResponse
     @GetMapping("/products")
     public PaginatedResponse<Product> list(
             @PageableDefault(size = PAGE_SIZE, sort = PAGE_SORT) Pageable pageable) {
 
         Page<Product> products = productService.list(pageable);
-
-        PaginatedResponse<Product> response = new PaginatedResponse<>();
-        response.setContent(products.getContent());
-        response.setPageNumber(products.getNumber());
-        response.setPageSize(products.getSize());
-        response.setTotalElements(products.getTotalElements());
-        response.setTotalPages(products.getTotalPages());
-
-        return response;
+        return PaginatedResponse.of(products);
     }
 
     @GetMapping("/products/{id}")
@@ -57,14 +48,7 @@ public class ProductController {
             @PageableDefault(size = PAGE_SIZE, sort = PAGE_SORT) Pageable pageable) {
                 
         Page<Product> products = productService.search(searchTerm, pageable);
-        PaginatedResponse<Product> response = new PaginatedResponse<>();
-        response.setContent(products.getContent());
-        response.setPageNumber(products.getNumber());
-        response.setPageSize(products.getSize());
-        response.setTotalElements(products.getTotalElements());
-        response.setTotalPages(products.getTotalPages());
-
-        return response;
+        return PaginatedResponse.of(products);
     }
 
     @PostMapping("/products")
