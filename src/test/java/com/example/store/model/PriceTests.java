@@ -31,33 +31,39 @@ class PriceTests {
         assertEquals("EUR", rounded.getCurrency().getCurrencyCode());
     }
 
+    @Test
     void equalsAndHashCode() {
         Price target = createPriceEur(1.49);
-        Price equalPrice = createPriceEur(1.49);
+        target.setId(1L);
+        Price otherEqualAmount = createPriceEur(1.49);
+        otherEqualAmount.setId(2L);
+        Price otherTransient = createPriceEur(1.49);
 
-        assertEquals(target, equalPrice);
         assertEquals(target, target);
-        assertEquals(target.hashCode(), equalPrice.hashCode());
+
+        assertNotEquals(target, otherEqualAmount);
+        assertNotEquals(target, otherTransient);
+        assertNotEquals(target, "{EUR 1.49}");
+        assertNotEquals(target, null);
+        assertNotEquals(target.hashCode(), otherEqualAmount.hashCode());
+        assertNotEquals(target.hashCode(), otherTransient.hashCode());
     }
 
     @Test
-    void notEqualsAndHashCode() {
+    void equalsAndHashCodeForTransient() {
         Price target = createPriceEur(1.49);
-        Price differentPrice = createPriceEur(2.49);
-        Price otherCurrency = createPriceEur(1.49);
-        otherCurrency.setCurrency(Currency.getInstance("RON"));
+        Price otherTransient = createPriceEur(1.55);
 
         assertEquals(target, target);
-        assertNotEquals(target, differentPrice);
-        assertNotEquals(target, otherCurrency);
-        assertNotEquals(target, "EUR 1.49");
+
+        assertNotEquals(target, otherTransient);
+        assertNotEquals(target, "{EUR 1.49}");
         assertNotEquals(target, null);
-        assertNotEquals(target.hashCode(), differentPrice.hashCode());
-        assertNotEquals(target.hashCode(), otherCurrency.hashCode());
+        assertEquals(target.hashCode(), otherTransient.hashCode());
     }
 
     @Test
     void testToString() {
-        assertEquals("EUR 1.00", createPriceEur(1.00).toString());
+        assertEquals("{EUR 1.00}", createPriceEur(1.00).toString());
     }
 }

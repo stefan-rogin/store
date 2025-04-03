@@ -1,25 +1,22 @@
 package com.example.store.model;
 
+import java.util.Objects;
+import java.util.UUID;
+
 import org.hibernate.annotations.SoftDelete;
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import org.hibernate.validator.constraints.UUID;
 
 @Entity
 @SoftDelete
-public class Product {
+public class Product implements Identifiable<UUID> {
 
     public static final int MAX_NAME_SIZE = 2000;
 
-    public Product() {
-        this.resId = java.util.UUID.randomUUID().toString();
-    }
-
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private UUID id = UUID.randomUUID();
 
     @NotBlank
     @Size(min = 1, max = MAX_NAME_SIZE)
@@ -30,18 +27,6 @@ public class Product {
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     private Price price;
 
-    @UUID
-    @Column(unique = true, nullable = false)
-    private String resId;
-
-    public String getResId() {
-        return resId;
-    }
-
-    public void setResId(String resId) {
-        this.resId = resId;
-    }
-
     public String getName() {
         return name;
     }
@@ -50,11 +35,11 @@ public class Product {
         this.name = name;
     }
 
-    public Long getId() {
+    public UUID getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 
@@ -70,21 +55,20 @@ public class Product {
     public boolean equals(Object o) {
         if (this == o)
             return true;
-        if (o == null || getClass() != o.getClass())
+        if (!(o instanceof Product))
             return false;
         Product product = (Product) o;
-        return (name.equals(product.name) && price.equals(product.price)) &&
-                ((id == null && product.id == null) || (id != null && id.equals(product.id)));
+        return Objects.equals(id, product.getId());
     }
-
+    
     @Override
     public int hashCode() {
-        return java.util.Objects.hash(id, name, price);
+        return Objects.hash(id);
     }
 
     @Override
     public String toString() {
-        return String.format("[%s][%s][%s][%s]", id == null ? "null" : id, resId, name, price);
+        return String.format("{[%s][%s][%s]}", id, name, price);
     }
 
 }

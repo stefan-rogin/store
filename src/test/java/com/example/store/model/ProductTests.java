@@ -18,9 +18,7 @@ class ProductTests {
 
     private static Product createProductOne() {
         Product product = new Product();
-        product.setId(1L);
         product.setName("One");
-        product.setResId("33b5785c-8d8a-4301-b5b3-b07b67347173");
         product.setPrice(createPriceEur(1.49));
         return product;
     }
@@ -30,21 +28,19 @@ class ProductTests {
         Product product = new Product();
         Price price = createPriceEur(1.49);
 
-        product.setId(1L);
         product.setName("One");
         product.setPrice(price);
-        product.setResId("33b5785c-8d8a-4301-b5b3-b07b67347173");
 
-        assertEquals(1L, product.getId());
+        assertEquals("UUID", product.getId().getClass().getSimpleName());
         assertEquals("One", product.getName());
         assertEquals(price, product.getPrice());
-        assertEquals("33b5785c-8d8a-4301-b5b3-b07b67347173", product.getResId());
     }
 
     @Test
     void equalsAndHashCode() {
         Product target = createProductOne();
         Product equalProduct = createProductOne();
+        equalProduct.setId(target.getId());
 
         assertEquals(target, target);
         assertEquals(target, equalProduct);
@@ -54,56 +50,28 @@ class ProductTests {
     @Test
     void notEqualsAndHashCode() {
         Product target = createProductOne();
-
         Product differentId = createProductOne();
-        differentId.setId(2L);
 
         Product allDifferent = new Product();
-        allDifferent.setId(2L);
         allDifferent.setName("Two");
         allDifferent.setPrice(createPriceEur(2.49));
 
-        Product differentPrice = createProductOne();
-        differentPrice.setPrice(createPriceEur(2.49));
-
         assertNotEquals(target, differentId);
         assertNotEquals(target, allDifferent);
-        assertNotEquals(target, differentPrice);
         assertNotEquals(target, null);
-        assertNotEquals(target, "[1] One");
+        assertNotEquals(target, "{[33b5785c-8d8a-4301-b5b3-b07b67347173][One][{EUR 1.49}]}");
 
         assertNotEquals(target.hashCode(), differentId.hashCode());
         assertNotEquals(target.hashCode(), allDifferent.hashCode());
-        assertNotEquals(target.hashCode(), differentPrice.hashCode());
-    }
-
-    @Test
-    void equalsAndHashCodeNullIds() {
-        Product target = createProductOne();
-        target.setId(null);
-
-        Product equalProduct = createProductOne();
-        equalProduct.setId(null);
-
-        // TODO: Decide if this is the expected behavior
-        Product notEqualHasId = createProductOne();
-
-        assertEquals(target, equalProduct);
-
-        assertNotEquals(target, notEqualHasId);
-        assertNotEquals(target, null);
-        assertNotEquals(target, "[1] One");
-
-        assertEquals(target.hashCode(), equalProduct.hashCode());
-        assertNotEquals(target.hashCode(), notEqualHasId.hashCode());
     }
 
     @Test
     void testToString() {
         Product product = createProductOne();
-        assertEquals("[1][33b5785c-8d8a-4301-b5b3-b07b67347173][One][EUR 1.49]", product.toString());
+        String expectedId = product.getId().toString();
+        assertEquals(String.format("{[%s][One][{EUR 1.49}]}", expectedId), product.toString());
 
         product.setId(null);
-        assertEquals("[null][33b5785c-8d8a-4301-b5b3-b07b67347173][One][EUR 1.49]", product.toString());
+        assertEquals("{[null][One][{EUR 1.49}]}", product.toString());
     }
 }

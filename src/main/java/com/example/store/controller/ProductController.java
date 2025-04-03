@@ -1,11 +1,11 @@
 package com.example.store.controller;
 
-import org.hibernate.validator.constraints.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.ErrorResponseException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.validation.annotation.Validated;
 
+import java.util.UUID;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
@@ -22,13 +22,15 @@ import com.example.store.model.Price;
 @Validated
 public class ProductController {
 
+    private static final int PAGE_SIZE = 10;
+
     @Autowired
     private ProductService productService;
 
     // TODO: Extract PaginatedResponse
     @GetMapping("/products")
     public PaginatedResponse<Product> list(
-            @PageableDefault(size = 10, sort = "name") Pageable pageable) {
+            @PageableDefault(size = PAGE_SIZE, sort = "name") Pageable pageable) {
 
         Page<Product> products = productService.list(pageable);
 
@@ -42,9 +44,9 @@ public class ProductController {
         return response;
     }
 
-    @GetMapping("/products/{resId}")
-    public Product findResById(@UUID @PathVariable String resId) {
-        return productService.findByResId(resId)
+    @GetMapping("/products/{id}")
+    public Product findById(@PathVariable UUID id) {
+        return productService.findById(id)
             .orElseThrow(() -> new ErrorResponseException(HttpStatus.NOT_FOUND));
     }
     
@@ -69,26 +71,26 @@ public class ProductController {
         return productService.create(product);
     }
 
-    @PutMapping("/products/{resId}")
-    public Product upsert(@UUID @PathVariable String resId, @Valid @RequestBody Product product, HttpServletRequest request) {
-        return productService.upsert(resId, product);
+    @PutMapping("/products/{id}")
+    public Product upsert(@PathVariable UUID id, @Valid @RequestBody Product product, HttpServletRequest request) {
+        return productService.upsert(id, product);
     }
 
-    @PatchMapping("/products/{resId}/price")
-    public Product patchPrice(@UUID @PathVariable String resId, @Valid @RequestBody Price newPrice, HttpServletRequest request) {
-        return productService.patchPrice(resId, newPrice)
+    @PatchMapping("/products/{id}/price")
+    public Product patchPrice(@PathVariable UUID id, @Valid @RequestBody Price newPrice, HttpServletRequest request) {
+        return productService.patchPrice(id, newPrice)
             .orElseThrow(() -> new ErrorResponseException(HttpStatus.NOT_FOUND));
     }
 
-    @PatchMapping("/products/{resId}/name")
-    public Product patchName(@UUID @PathVariable String resId, @Valid @RequestBody Product productWithNewName, HttpServletRequest request) {
-        return productService.patchName(resId, productWithNewName)
+    @PatchMapping("/products/{id}/name")
+    public Product patchName(@PathVariable UUID id, @Valid @RequestBody Product productWithNewName, HttpServletRequest request) {
+        return productService.patchName(id, productWithNewName)
             .orElseThrow(() -> new ErrorResponseException(HttpStatus.NOT_FOUND));
     }
         
-    @DeleteMapping("/products/{resId}")
-    public void deleteById(@UUID @PathVariable String resId) {
-        productService.deleteByResId(resId);
+    @DeleteMapping("/products/{id}")
+    public void deleteById(@PathVariable UUID id) {
+        productService.deleteById(id);
     }
 
 }

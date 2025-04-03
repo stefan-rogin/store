@@ -1,6 +1,8 @@
 package com.example.store.service;
 
 import java.util.Optional;
+import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Page;
@@ -17,12 +19,8 @@ public class ProductService {
     @Autowired
     private ProductRepository productRepository;
 
-    public Optional<Product> findById(Long id) {
+    public Optional<Product> findById(UUID id) {
         return productRepository.findById(id);
-    }
-
-    public Optional<Product> findByResId(String resId) {
-        return productRepository.findByResId(resId);
     }
 
     public Page<Product> list(Pageable pageable) {
@@ -37,26 +35,26 @@ public class ProductService {
         return productRepository.save(product);
     }
 
-    public Product upsert(String resId, Product product) {
-        return productRepository.findByResId(resId)
+    public Product upsert(UUID id, Product product) {
+        return productRepository.findById(id)
                 .map(target -> productRepository.save(ProductUpdater.prepareUpdate(target, product)))
                 .orElseGet(() -> {
-                    product.setResId(resId);
+                    product.setId(id);
                     return productRepository.save(product);
                 });
     }
 
-    public Optional<Product> patchPrice(String resId, Price newPrice) {
-        return productRepository.findByResId(resId)
+    public Optional<Product> patchPrice(UUID id, Price newPrice) {
+        return productRepository.findById(id)
                 .map(target -> productRepository.save(ProductUpdater.preparePatchPrice(target, newPrice)));
     }
 
-    public Optional<Product> patchName(String resId, Product productWithNewName) {
-        return productRepository.findByResId(resId)
+    public Optional<Product> patchName(UUID id, Product productWithNewName) {
+        return productRepository.findById(id)
                 .map(target -> productRepository.save(ProductUpdater.preparePatchName(target, productWithNewName)));
     }
 
-    public void deleteByResId(String resId) {
-        productRepository.deleteByResId(resId);
+    public void deleteById(UUID id) {
+        productRepository.deleteById(id);
     }
 }

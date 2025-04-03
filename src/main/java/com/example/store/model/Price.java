@@ -3,6 +3,7 @@ package com.example.store.model;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Currency;
+import java.util.Objects;
 
 import org.hibernate.annotations.SoftDelete;
 import jakarta.persistence.*;
@@ -11,7 +12,7 @@ import jakarta.validation.constraints.PositiveOrZero;
 
 @Entity
 @SoftDelete
-public class Price {
+public class Price implements Identifiable<Long> {
 
     public static final int DEFAULT_SCALE = 2;
     public static final int DEFAULT_PRECISION = 19;
@@ -27,6 +28,14 @@ public class Price {
 
     @NotNull
     private Currency currency;
+
+    public Long getId() {
+        return this.id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public BigDecimal getAmount() {
         return this.amount;
@@ -48,20 +57,20 @@ public class Price {
     public boolean equals(Object o) {
         if (this == o)
             return true;
-        if (o == null || getClass() != o.getClass())
+        if (!(o instanceof Price))
             return false;
         Price price = (Price) o;
-        return amount.equals(price.amount) && currency.equals(price.currency);
+        return id != null && id.equals(price.getId());
     }
-
+    
     @Override
     public int hashCode() {
-        return java.util.Objects.hash(amount, currency);
+        return Objects.hash(id);
     }
 
     @Override
     public String toString() {
-        return String.format("%s %s", currency, amount);
+        return String.format("{%s %s}", currency, amount);
     }
 
 }

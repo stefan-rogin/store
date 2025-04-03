@@ -1,22 +1,21 @@
 package com.example.store.repository;
 
-import java.util.Optional;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
+
+import java.util.UUID;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import com.example.store.model.Product;
 
-public interface ProductRepository extends CrudRepository<Product, Long> {
+public interface ProductRepository extends CrudRepository<Product, UUID> {
     
     @Query("select p from Product p where lower(p.name) like lower(concat('%', :searchTerm, '%'))")
     Page<Product> search(@Param("searchTerm") String searchTerm, Pageable pageable);
 
     Page<Product> findAll(Pageable pageable);
 
-    Optional<Product> findByResId(@Param("resId") String resId);
-
-    void deleteByResId(@Param("resId") String resId);
 }
