@@ -17,11 +17,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Centralized error handler, leveraging the we-friendly implementation from ResponseEntityExceptionHandler.
- * Remaining in the same line, the two custom handlers responding with ProblemDetail objects.
+ * Centralized error handler, leveraging the web-friendly implementation from
+ * ResponseEntityExceptionHandler.
+ * Remaining in the same line, the two custom handlers are responding with
+ * ProblemDetail objects.
  * 
- * The catch-all handleException does not send error message details, to protect possibly sensitive 
- * information. 
+ * The catch-all handleException does not send error message details, to protect
+ * possibly sensitive
+ * information.
  */
 @ControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
@@ -36,8 +39,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 ex.getLocalizedMessage()), HttpStatus.BAD_REQUEST);
     }
 
-    // Catch-all exception handler for anything not explicitly handled by either ResponseEntityExceptionHandler
-    // or handleConstraintViolationException.
+    // Catch-all exception handler for anything not explicitly handled by either
+    // ResponseEntityExceptionHandler or handleConstraintViolationException.
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> handleException(Exception ex) {
         logger.error(ex.getMessage());
@@ -45,8 +48,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 "Internal server error."), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    // Override handleExceptionInternal to include logging of errors. WARN is used as most are under
-    // clients' control and not actionable.
+    // Override handleExceptionInternal to include logging of errors. WARN is used
+    // as most are under clients' control and not actionable.
     @Override
     protected ResponseEntity<Object> handleExceptionInternal(
             @NonNull Exception ex,
